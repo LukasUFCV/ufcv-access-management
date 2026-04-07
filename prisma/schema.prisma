@@ -1,0 +1,618 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+  ACTIVE
+  DISABLED
+  INVITED
+}
+
+enum PersonStatus {
+  PREPARATION
+  ACTIVE
+  TRANSITION
+  SORTIE
+  ARCHIVEE
+}
+
+enum AccessStatus {
+  PENDING
+  ACTIVE
+  EXPIRED
+  REVOKED
+  RETURNED
+}
+
+enum MaterialState {
+  AVAILABLE
+  ASSIGNED
+  IN_MAINTENANCE
+  RETIRED
+  LOST
+}
+
+enum DocumentAssignmentStatus {
+  A_LIRE
+  A_SIGNER
+  SIGNE
+  EXPIRE
+  REMPLACE
+}
+
+enum WorkflowStatus {
+  BROUILLON
+  EN_COURS
+  EN_ATTENTE
+  TERMINE
+  BLOQUE
+}
+
+enum WorkflowTaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+  BLOCKED
+  SKIPPED
+}
+
+enum NotificationType {
+  INFO
+  WARNING
+  ACTION_REQUIRED
+  SUCCESS
+}
+
+enum ConnectorType {
+  AUTH
+  DIRECTORY
+  GRAPH
+  ACCESS_PROVISIONING
+  NOTIFICATIONS
+}
+
+enum ConnectorStatus {
+  ACTIVE
+  INACTIVE
+  ERROR
+}
+
+enum SyncDirection {
+  INBOUND
+  OUTBOUND
+  BIDIRECTIONAL
+}
+
+enum AuditSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum DocumentValueType {
+  INTERNE_MORALE
+  ORGANISATIONNELLE
+}
+
+model Role {
+  id          String           @id @default(cuid())
+  code        String           @unique
+  name        String
+  description String?
+  isSystem    Boolean          @default(false)
+  permissions RolePermission[]
+  userRoles   UserRole[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model Permission {
+  id          String           @id @default(cuid())
+  code        String           @unique
+  name        String
+  description String?
+  roles       RolePermission[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+
+  @@id([roleId, permissionId])
+}
+
+model User {
+  id             String         @id @default(cuid())
+  login          String         @unique
+  email          String         @unique
+  passwordHash   String
+  status         UserStatus     @default(ACTIVE)
+  personId       String?        @unique
+  person         Person?        @relation(fields: [personId], references: [id], onDelete: SetNull)
+  roles          UserRole[]
+  notifications  Notification[]
+  createdAudit   AuditLog[]     @relation("AuditActor")
+  signatures     DocumentSignature[]
+  assignedDocs   DocumentAssignment[] @relation("AssignedByUser")
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  lastLoginAt    DateTime?
+}
+
+model UserRole {
+  userId     String
+  roleId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role       Role     @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  assignedAt DateTime @default(now())
+
+  @@id([userId, roleId])
+}
+
+model ActorType {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  label       String
+  description String?
+  people      Person[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Region {
+  id        String    @id @default(cuid())
+  code      String    @unique
+  name      String
+  cities    City[]
+  people    Person[]
+  orgNodes  OrgNode[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model City {
+  id        String    @id @default(cuid())
+  name      String
+  postalCode String?
+  regionId  String
+  region    Region    @relation(fields: [regionId], references: [id], onDelete: Restrict)
+  people    Person[]
+  orgNodes  OrgNode[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([name, regionId])
+}
+
+model Domain {
+  id          String     @id @default(cuid())
+  code        String     @unique
+  name        String
+  description String?
+  activities  Activity[]
+  positions   Position[]
+  orgNodes    OrgNode[]
+  people      Person[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Activity {
+  id          String     @id @default(cuid())
+  code        String     @unique
+  name        String
+  description String?
+  domainId    String
+  domain      Domain     @relation(fields: [domainId], references: [id], onDelete: Restrict)
+  positions   Position[]
+  orgNodes    OrgNode[]
+  people      Person[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model JobType {
+  id          String     @id @default(cuid())
+  code        String     @unique
+  name        String
+  description String?
+  positions   Position[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Position {
+  id             String   @id @default(cuid())
+  code           String   @unique
+  title          String
+  description    String?
+  hierarchicalLevel String?
+  domainId       String?
+  activityId     String?
+  jobTypeId      String?
+  domain         Domain?    @relation(fields: [domainId], references: [id], onDelete: SetNull)
+  activity       Activity?  @relation(fields: [activityId], references: [id], onDelete: SetNull)
+  jobType        JobType?   @relation(fields: [jobTypeId], references: [id], onDelete: SetNull)
+  people         Person[]
+  orgNodes       OrgNode[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model OrgNode {
+  id          String    @id @default(cuid())
+  name        String
+  code        String    @unique
+  type        String
+  parentId    String?
+  parent      OrgNode?  @relation("OrgHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children    OrgNode[] @relation("OrgHierarchy")
+  regionId    String?
+  cityId      String?
+  domainId    String?
+  activityId  String?
+  positionId  String?
+  region      Region?   @relation(fields: [regionId], references: [id], onDelete: SetNull)
+  city        City?     @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  domain      Domain?   @relation(fields: [domainId], references: [id], onDelete: SetNull)
+  activity    Activity? @relation(fields: [activityId], references: [id], onDelete: SetNull)
+  position    Position? @relation(fields: [positionId], references: [id], onDelete: SetNull)
+  people      Person[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Person {
+  id                 String                 @id @default(cuid())
+  firstName          String
+  lastName           String
+  sessionIdentifier  String                 @unique
+  emailProfessional  String                 @unique
+  phoneProfessional  String?
+  photoUrl           String?
+  actorTypeId        String
+  actorType          ActorType              @relation(fields: [actorTypeId], references: [id], onDelete: Restrict)
+  positionId         String?
+  position           Position?              @relation(fields: [positionId], references: [id], onDelete: SetNull)
+  domainId           String?
+  domain             Domain?                @relation(fields: [domainId], references: [id], onDelete: SetNull)
+  activityId         String?
+  activity           Activity?              @relation(fields: [activityId], references: [id], onDelete: SetNull)
+  regionId           String?
+  region             Region?                @relation(fields: [regionId], references: [id], onDelete: SetNull)
+  cityId             String?
+  city               City?                  @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  managerId          String?
+  manager            Person?                @relation("ManagerHierarchy", fields: [managerId], references: [id], onDelete: SetNull)
+  reports            Person[]               @relation("ManagerHierarchy")
+  orgNodeId          String?
+  orgNode            OrgNode?               @relation(fields: [orgNodeId], references: [id], onDelete: SetNull)
+  hierarchyLevel     String?
+  startDate          DateTime?
+  endDate            DateTime?
+  status             PersonStatus           @default(PREPARATION)
+  isExternal         Boolean                @default(false)
+  notes              String?
+  archivedAt         DateTime?
+  user               User?
+  statusHistory      PersonStatusHistory[]
+  materialAssignments MaterialAssignment[]
+  softwareAssignments SoftwareAssignment[]
+  informationAssignments InformationAssignment[]
+  documentAssignments DocumentAssignment[]
+  onboardingCases    OnboardingCase[]
+  offboardingCases   OffboardingCase[]
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+
+  @@index([lastName, firstName])
+  @@index([status])
+}
+
+model PersonStatusHistory {
+  id          String       @id @default(cuid())
+  personId     String
+  person       Person       @relation(fields: [personId], references: [id], onDelete: Cascade)
+  fromStatus   PersonStatus?
+  toStatus     PersonStatus
+  reason       String?
+  effectiveAt  DateTime     @default(now())
+  createdAt    DateTime     @default(now())
+}
+
+model AccessCategory {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  label       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model MaterialAsset {
+  id           String              @id @default(cuid())
+  assetTag     String              @unique
+  name         String
+  assetType    String
+  serialNumber String?
+  description  String?
+  state        MaterialState       @default(AVAILABLE)
+  assignments  MaterialAssignment[]
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+}
+
+model MaterialAssignment {
+  id          String        @id @default(cuid())
+  personId    String
+  assetId     String
+  status      AccessStatus  @default(ACTIVE)
+  assignedAt  DateTime      @default(now())
+  dueBackAt   DateTime?
+  returnedAt  DateTime?
+  notes       String?
+  person      Person        @relation(fields: [personId], references: [id], onDelete: Cascade)
+  asset       MaterialAsset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  history     AccessHistory[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model SoftwareResource {
+  id              String               @id @default(cuid())
+  name            String
+  slug            String               @unique
+  licenseType     String
+  provisioningKey String?
+  description     String?
+  assignments     SoftwareAssignment[]
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+}
+
+model SoftwareAssignment {
+  id            String          @id @default(cuid())
+  personId      String
+  resourceId    String
+  status        AccessStatus    @default(ACTIVE)
+  justification String?
+  startDate     DateTime
+  endDate       DateTime?
+  person        Person          @relation(fields: [personId], references: [id], onDelete: Cascade)
+  resource      SoftwareResource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  history       AccessHistory[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+}
+
+model InformationResource {
+  id          String                  @id @default(cuid())
+  name        String
+  slug        String                  @unique
+  resourceType String
+  owner       String?
+  description String?
+  assignments InformationAssignment[]
+  createdAt   DateTime                @default(now())
+  updatedAt   DateTime                @updatedAt
+}
+
+model InformationAssignment {
+  id         String               @id @default(cuid())
+  personId   String
+  resourceId String
+  status     AccessStatus         @default(ACTIVE)
+  startDate  DateTime
+  endDate    DateTime?
+  person     Person               @relation(fields: [personId], references: [id], onDelete: Cascade)
+  resource   InformationResource  @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  history    AccessHistory[]
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+}
+
+model AccessHistory {
+  id                      String                 @id @default(cuid())
+  categoryCode            String
+  eventType               String
+  materialAssignmentId    String?
+  softwareAssignmentId    String?
+  informationAssignmentId String?
+  metadata                Json?
+  materialAssignment      MaterialAssignment?    @relation(fields: [materialAssignmentId], references: [id], onDelete: Cascade)
+  softwareAssignment      SoftwareAssignment?    @relation(fields: [softwareAssignmentId], references: [id], onDelete: Cascade)
+  informationAssignment   InformationAssignment? @relation(fields: [informationAssignmentId], references: [id], onDelete: Cascade)
+  createdAt               DateTime               @default(now())
+}
+
+model DocumentCategory {
+  id          String     @id @default(cuid())
+  code        String     @unique
+  label       String
+  description String?
+  documents   Document[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Document {
+  id                String               @id @default(cuid())
+  code              String               @unique
+  title             String
+  description       String?
+  categoryId        String
+  category          DocumentCategory     @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  valueType         DocumentValueType    @default(ORGANISATIONNELLE)
+  consequenceText   String?
+  isActive          Boolean              @default(true)
+  currentVersionId  String?              @unique
+  currentVersion    DocumentVersion?     @relation("CurrentVersion", fields: [currentVersionId], references: [id], onDelete: SetNull)
+  versions          DocumentVersion[]    @relation("DocumentVersions")
+  assignments       DocumentAssignment[]
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+}
+
+model DocumentVersion {
+  id                  String               @id @default(cuid())
+  documentId          String
+  document            Document             @relation("DocumentVersions", fields: [documentId], references: [id], onDelete: Cascade)
+  currentForDocument  Document?            @relation("CurrentVersion")
+  versionLabel        String
+  contentMarkdown     String
+  checksum            String
+  publishedAt         DateTime             @default(now())
+  expiresAt           DateTime?
+  assignments         DocumentAssignment[]
+  signatures          DocumentSignature[]
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  @@unique([documentId, versionLabel])
+}
+
+model DocumentAssignment {
+  id                String                   @id @default(cuid())
+  documentId        String
+  versionId         String
+  personId          String
+  assignedByUserId  String?
+  status            DocumentAssignmentStatus @default(A_SIGNER)
+  dueDate           DateTime?
+  acknowledgedAt    DateTime?
+  signedAt          DateTime?
+  replacedAt        DateTime?
+  notes             String?
+  document          Document                 @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  version           DocumentVersion          @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  person            Person                   @relation(fields: [personId], references: [id], onDelete: Cascade)
+  assignedBy        User?                    @relation("AssignedByUser", fields: [assignedByUserId], references: [id], onDelete: SetNull)
+  signature         DocumentSignature?
+  createdAt         DateTime                 @default(now())
+  updatedAt         DateTime                 @updatedAt
+}
+
+model DocumentSignature {
+  id                String             @id @default(cuid())
+  documentAssignmentId String          @unique
+  documentAssignment DocumentAssignment @relation(fields: [documentAssignmentId], references: [id], onDelete: Cascade)
+  versionId         String
+  version           DocumentVersion    @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  userId            String
+  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  signedAt          DateTime           @default(now())
+  ipAddress         String?
+  userAgent         String?
+  acknowledgementText String?
+  createdAt         DateTime           @default(now())
+}
+
+model OnboardingCase {
+  id             String         @id @default(cuid())
+  personId        String
+  person          Person         @relation(fields: [personId], references: [id], onDelete: Cascade)
+  status          WorkflowStatus @default(EN_COURS)
+  dueDate         DateTime?
+  completionRate  Int            @default(0)
+  notes           String?
+  tasks           WorkflowTask[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+model OffboardingCase {
+  id             String         @id @default(cuid())
+  personId        String
+  person          Person         @relation(fields: [personId], references: [id], onDelete: Cascade)
+  status          WorkflowStatus @default(EN_COURS)
+  dueDate         DateTime?
+  completionRate  Int            @default(0)
+  notes           String?
+  tasks           WorkflowTask[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+model WorkflowTask {
+  id               String             @id @default(cuid())
+  title            String
+  description      String?
+  order            Int
+  status           WorkflowTaskStatus @default(TODO)
+  dueDate          DateTime?
+  completedAt      DateTime?
+  onboardingCaseId String?
+  offboardingCaseId String?
+  onboardingCase   OnboardingCase?    @relation(fields: [onboardingCaseId], references: [id], onDelete: Cascade)
+  offboardingCase  OffboardingCase?   @relation(fields: [offboardingCaseId], references: [id], onDelete: Cascade)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+}
+
+model AuditLog {
+  id         String        @id @default(cuid())
+  actorId    String?
+  actor      User?         @relation("AuditActor", fields: [actorId], references: [id], onDelete: SetNull)
+  action     String
+  entityType String
+  entityId   String?
+  severity   AuditSeverity @default(INFO)
+  metadata   Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime      @default(now())
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  type      NotificationType @default(INFO)
+  isRead    Boolean          @default(false)
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+}
+
+model ExternalConnectorConfig {
+  id          String          @id @default(cuid())
+  code        String          @unique
+  name        String
+  type        ConnectorType
+  status      ConnectorStatus @default(ACTIVE)
+  baseUrl     String?
+  config      Json?
+  lastSyncAt  DateTime?
+  syncJobs    SyncJob[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model SyncJob {
+  id            String                  @id @default(cuid())
+  connectorId   String
+  connector     ExternalConnectorConfig @relation(fields: [connectorId], references: [id], onDelete: Cascade)
+  name          String
+  direction     SyncDirection           @default(BIDIRECTIONAL)
+  status        ConnectorStatus         @default(ACTIVE)
+  lastStartedAt DateTime?
+  lastEndedAt   DateTime?
+  payload       Json?
+  result        Json?
+  createdAt     DateTime                @default(now())
+  updatedAt     DateTime                @updatedAt
+}

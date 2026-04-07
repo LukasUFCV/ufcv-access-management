@@ -1,0 +1,11 @@
+{
+  "extends": "../../packages/config/tsconfig/node.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "tests/**/*.ts", "../../prisma/seed.ts"]
+}

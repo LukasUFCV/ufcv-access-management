@@ -1,0 +1,16 @@
+node_modules/
+dist/
+coverage/
+.turbo/
+.cache/
+.vite/
+playwright-report/
+test-results/
+.DS_Store
+*.log
+.env
+.env.local
+.env.*.local
+apps/api/uploads/
+prisma/dev.db
+

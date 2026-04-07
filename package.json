@@ -1,0 +1,28 @@
+{
+  "name": "ufcv-access-management",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c blue,green \"npm run dev -w @ufcv/api\" \"npm run dev -w @ufcv/web\"",
+    "build": "npm run build -w @ufcv/shared && npm run build -w @ufcv/api && npm run build -w @ufcv/web",
+    "lint": "npm run lint -w @ufcv/api && npm run lint -w @ufcv/web",
+    "test": "npm run test -w @ufcv/api && npm run test -w @ufcv/web",
+    "format": "prettier --write .",
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f postgres",
+    "prisma:generate": "npm run prisma:generate -w @ufcv/api",
+    "prisma:migrate": "npm run prisma:migrate -w @ufcv/api",
+    "prisma:seed": "npm run prisma:seed -w @ufcv/api",
+    "e2e": "npm run e2e -w @ufcv/web"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "prettier": "^3.3.3"
+  }
+}
+

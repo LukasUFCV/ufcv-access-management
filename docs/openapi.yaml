@@ -1,0 +1,152 @@
+openapi: 3.0.3
+info:
+  title: Habilitations UFCV API
+  version: 1.0.0
+  description: API REST interne de gestion des habilitations UFCV.
+servers:
+  - url: http://localhost:4000/api/v1
+paths:
+  /auth/login:
+    post:
+      summary: Authentifier un utilisateur local
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [login, password]
+              properties:
+                login:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Session ouverte
+  /auth/me:
+    get:
+      summary: Retourner la session courante
+      responses:
+        '200':
+          description: Utilisateur courant
+  /people:
+    get:
+      summary: Lister les personnes
+      responses:
+        '200':
+          description: Liste paginee
+    post:
+      summary: Creer une personne
+      responses:
+        '201':
+          description: Personne creee
+  /people/{id}:
+    get:
+      summary: Detail d'une personne
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Detail personne
+    patch:
+      summary: Modifier une personne
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Personne modifiee
+  /assets/material:
+    get:
+      summary: Lister le materiel
+      responses:
+        '200':
+          description: Parc materiel
+    post:
+      summary: Creer un materiel
+      responses:
+        '201':
+          description: Materiel cree
+  /software-assignments:
+    post:
+      summary: Creer une attribution logicielle
+      responses:
+        '201':
+          description: Attribution creee
+  /documents:
+    get:
+      summary: Lister les documents
+      responses:
+        '200':
+          description: Liste documents
+    post:
+      summary: Creer un document
+      responses:
+        '201':
+          description: Document cree
+  /documents/{id}/assign:
+    post:
+      summary: Assigner un document
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Assignation creee
+  /documents/{id}/sign:
+    post:
+      summary: Signer un document
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Signature creee
+  /onboarding:
+    get:
+      summary: Lister les onboardings
+      responses:
+        '200':
+          description: Liste des dossiers onboarding
+    post:
+      summary: Creer un onboarding
+      responses:
+        '201':
+          description: Dossier onboarding cree
+  /offboarding:
+    get:
+      summary: Lister les offboardings
+      responses:
+        '200':
+          description: Liste des dossiers offboarding
+    post:
+      summary: Creer un offboarding
+      responses:
+        '201':
+          description: Dossier offboarding cree
+  /notifications:
+    get:
+      summary: Lister les notifications de l'utilisateur
+      responses:
+        '200':
+          description: Liste notifications
+  /audit-logs:
+    get:
+      summary: Consulter l'audit
+      responses:
+        '200':
+          description: Liste d'audit
