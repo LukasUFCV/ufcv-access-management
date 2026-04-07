@@ -1,6 +1,12 @@
-import 'dotenv/config';
-
+import { config } from 'dotenv';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
+
+const currentDir = dirname(fileURLToPath(import.meta.url));
+
+config({ path: resolve(currentDir, '../../../../.env') });
+config({ path: resolve(currentDir, '../../../../prisma/.env'), override: false });
 
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
@@ -26,4 +32,3 @@ const envSchema = z.object({
 });
 
 export const env = envSchema.parse(process.env);
-
