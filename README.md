@@ -72,6 +72,8 @@ Le seed cree les comptes suivants avec le mot de passe defini par `SEED_DEMO_PAS
 
 Copier `.env.example` en `.env` puis ajuster si besoin.
 
+Les scripts Prisma de la racine synchronisent automatiquement ce fichier vers `prisma/.env` avant execution.
+
 Variables importantes :
 
 - `DATABASE_URL`
@@ -257,4 +259,3 @@ Point restant dependant de la machine :
 Spec OpenAPI simplifiee :
 
 - [openapi.yaml](/C:/Users/lmauffre/Documents/ufcv-access-management/docs/openapi.yaml)
-

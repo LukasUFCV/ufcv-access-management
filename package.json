@@ -15,9 +15,10 @@
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
     "db:logs": "docker compose logs -f postgres",
-    "prisma:generate": "npm run prisma:generate -w @ufcv/api",
-    "prisma:migrate": "npm run prisma:migrate -w @ufcv/api",
-    "prisma:seed": "npm run prisma:seed -w @ufcv/api",
+    "prisma:prepare-env": "node -e \"const fs=require('fs'); fs.writeFileSync('prisma/.env', fs.readFileSync('.env', 'utf8'))\"",
+    "prisma:generate": "npm run prisma:prepare-env && npm run prisma:generate -w @ufcv/api",
+    "prisma:migrate": "npm run prisma:prepare-env && npm run prisma:migrate -w @ufcv/api",
+    "prisma:seed": "npm run prisma:prepare-env && npm run prisma:seed -w @ufcv/api",
     "e2e": "npm run e2e -w @ufcv/web"
   },
   "devDependencies": {
@@ -25,4 +26,3 @@
     "prettier": "^3.3.3"
   }
 }
-

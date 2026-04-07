@@ -9,8 +9,8 @@ test-results/
 .DS_Store
 *.log
 .env
+/prisma/.env
 .env.local
 .env.*.local
 apps/api/uploads/
 prisma/dev.db
-
