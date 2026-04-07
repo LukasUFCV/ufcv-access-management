@@ -6,18 +6,18 @@ import { AppError } from '../../core/errors/app-error.js';
 import { auditService } from '../audit/audit.service.js';
 
 const defaultOnboardingTasks = [
-  'Creer le dossier utilisateur',
-  'Attribuer les acces initiaux',
-  'Mettre a disposition les documents',
-  'Verifier la prise de poste',
+  'Créer le dossier utilisateur',
+  'Attribuer les accès initiaux',
+  'Mettre à disposition les documents',
+  'Vérifier la prise de poste',
 ];
 
 const defaultOffboardingTasks = [
   'Planifier la date de sortie',
-  'Revoquer les acces logiciels',
-  "Retirer les acces a l'information",
-  'Recuperer le materiel',
-  'Cloturer le dossier',
+  'Révoquer les accès logiciels',
+  'Retirer les accès à l’information',
+  'Récupérer le matériel',
+  'Clôturer le dossier',
 ];
 
 const mapCase = (
@@ -153,7 +153,7 @@ export class WorkflowsService {
     input: { status?: WorkflowStatus; dueDate?: Date | null; notes?: string | null; completionRate?: number },
   ) {
     const existing = await prisma.onboardingCase.findUnique({ where: { id } });
-    if (!existing) throw new AppError(404, 'Onboarding introuvable.');
+    if (!existing) throw new AppError(404, 'Parcours d’arrivée introuvable.');
 
     const updated = await prisma.onboardingCase.update({ where: { id }, data: input });
 
@@ -173,7 +173,7 @@ export class WorkflowsService {
     input: { status?: WorkflowStatus; dueDate?: Date | null; notes?: string | null; completionRate?: number },
   ) {
     const existing = await prisma.offboardingCase.findUnique({ where: { id } });
-    if (!existing) throw new AppError(404, 'Offboarding introuvable.');
+    if (!existing) throw new AppError(404, 'Parcours de départ introuvable.');
 
     const updated = await prisma.offboardingCase.update({ where: { id }, data: input });
 

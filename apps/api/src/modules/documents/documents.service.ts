@@ -57,7 +57,7 @@ export class DocumentsService {
 
     const version = document.versions[0];
     if (!version) {
-      throw new AppError(500, 'Version de document non generee.');
+      throw new AppError(500, 'La version du document n’a pas été générée.');
     }
 
     await prisma.document.update({
@@ -157,7 +157,7 @@ export class DocumentsService {
     context: { ipAddress?: string | null; userAgent?: string | null },
   ) {
     const user = await prisma.user.findUnique({ where: { id: userId } });
-    if (!user?.personId) throw new AppError(400, 'Aucun profil de personne lie a cet utilisateur.');
+    if (!user?.personId) throw new AppError(400, 'Aucun profil de personne n’est lié à cet utilisateur.');
 
     const assignment = input.assignmentId
       ? await prisma.documentAssignment.findUnique({
@@ -177,7 +177,7 @@ export class DocumentsService {
         });
 
     if (!assignment || assignment.documentId !== documentId) {
-      throw new AppError(404, 'Assignation de document introuvable.');
+      throw new AppError(404, 'Attribution de document introuvable.');
     }
 
     if (assignment.personId !== user.personId) {

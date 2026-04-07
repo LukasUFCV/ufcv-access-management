@@ -154,7 +154,7 @@ async function main() {
         data: {
           code,
           name: code.replaceAll('_', ' '),
-          description: `Role systeme ${code}`,
+          description: `Rôle système ${code}`,
           isSystem: true,
           permissions: {
             create: rolePermissions[code].map((permissionCode) => ({
@@ -168,8 +168,8 @@ async function main() {
   const roleMap = new Map(roleRecords.map((item) => [item.code, item.id]));
 
   const actorTypes = await Promise.all([
-    prisma.actorType.create({ data: { code: 'SALARIE', label: 'Salarie' } }),
-    prisma.actorType.create({ data: { code: 'BENEVOLE', label: 'Benevole' } }),
+    prisma.actorType.create({ data: { code: 'SALARIE', label: 'Salarié' } }),
+    prisma.actorType.create({ data: { code: 'BENEVOLE', label: 'Bénévole' } }),
     prisma.actorType.create({ data: { code: 'STAGIAIRE', label: 'Stagiaire' } }),
     prisma.actorType.create({ data: { code: 'INTERVENANT_EXTERNE', label: 'Intervenant externe' } }),
     prisma.actorType.create({ data: { code: 'VOLONTAIRE', label: 'Volontaire' } }),
@@ -177,33 +177,33 @@ async function main() {
   const actorTypeMap = new Map(actorTypes.map((item) => [item.code, item.id]));
 
   await Promise.all([
-    prisma.accessCategory.create({ data: { code: 'material', label: 'Acces materiel' } }),
-    prisma.accessCategory.create({ data: { code: 'software', label: 'Acces logiciel' } }),
-    prisma.accessCategory.create({ data: { code: 'information', label: "Acces a l'information" } }),
+    prisma.accessCategory.create({ data: { code: 'material', label: 'Accès matériel' } }),
+    prisma.accessCategory.create({ data: { code: 'software', label: 'Accès logiciel' } }),
+    prisma.accessCategory.create({ data: { code: 'information', label: 'Accès à l’information' } }),
   ]);
 
-  const idf = await prisma.region.create({ data: { code: 'IDF', name: 'Ile-de-France' } });
-  const aura = await prisma.region.create({ data: { code: 'AURA', name: 'Auvergne-Rhone-Alpes' } });
+  const idf = await prisma.region.create({ data: { code: 'IDF', name: 'Île-de-France' } });
+  const aura = await prisma.region.create({ data: { code: 'AURA', name: 'Auvergne-Rhône-Alpes' } });
   const naq = await prisma.region.create({ data: { code: 'NAQ', name: 'Nouvelle-Aquitaine' } });
 
   const paris = await prisma.city.create({ data: { name: 'Paris', postalCode: '75000', regionId: idf.id } });
-  const creteil = await prisma.city.create({ data: { name: 'Creteil', postalCode: '94000', regionId: idf.id } });
+  const creteil = await prisma.city.create({ data: { name: 'Créteil', postalCode: '94000', regionId: idf.id } });
   const lyon = await prisma.city.create({ data: { name: 'Lyon', postalCode: '69000', regionId: aura.id } });
   const bordeaux = await prisma.city.create({ data: { name: 'Bordeaux', postalCode: '33000', regionId: naq.id } });
 
   const rhDomain = await prisma.domain.create({ data: { code: 'RH', name: 'Ressources humaines' } });
   const itDomain = await prisma.domain.create({ data: { code: 'IT', name: 'DSI / DPMO' } });
-  const opsDomain = await prisma.domain.create({ data: { code: 'OPS', name: 'Operations territoriales' } });
-  const pedagogyDomain = await prisma.domain.create({ data: { code: 'PEDA', name: 'Pedagogie' } });
+  const opsDomain = await prisma.domain.create({ data: { code: 'OPS', name: 'Opérations territoriales' } });
+  const pedagogyDomain = await prisma.domain.create({ data: { code: 'PEDA', name: 'Pédagogie' } });
 
   const activityHr = await prisma.activity.create({ data: { code: 'HR-GEST', name: 'Gestion RH', domainId: rhDomain.id } });
   const activitySupport = await prisma.activity.create({ data: { code: 'IT-SUP', name: 'Support SI', domainId: itDomain.id } });
-  const activityDeployment = await prisma.activity.create({ data: { code: 'OPS-REG', name: 'Animation regionale', domainId: opsDomain.id } });
-  const activityTraining = await prisma.activity.create({ data: { code: 'PEDA-FORM', name: 'Accompagnement pedagogique', domainId: pedagogyDomain.id } });
+  const activityDeployment = await prisma.activity.create({ data: { code: 'OPS-REG', name: 'Animation régionale', domainId: opsDomain.id } });
+  const activityTraining = await prisma.activity.create({ data: { code: 'PEDA-FORM', name: 'Accompagnement pédagogique', domainId: pedagogyDomain.id } });
 
   const cdi = await prisma.jobType.create({ data: { code: 'CDI', name: 'CDI' } });
   const cdd = await prisma.jobType.create({ data: { code: 'CDD', name: 'CDD' } });
-  const benevolat = await prisma.jobType.create({ data: { code: 'BENEVOLAT', name: 'Benevolat' } });
+  const benevolat = await prisma.jobType.create({ data: { code: 'BENEVOLAT', name: 'Bénévolat' } });
   const stage = await prisma.jobType.create({ data: { code: 'STAGE', name: 'Stage' } });
   const prestation = await prisma.jobType.create({ data: { code: 'PRESTA', name: 'Prestation' } });
 
@@ -240,7 +240,7 @@ async function main() {
   const managerPosition = await prisma.position.create({
     data: {
       code: 'MGR-REG',
-      title: 'Responsable regional',
+      title: 'Responsable régional',
       hierarchicalLevel: 'N3',
       domainId: opsDomain.id,
       activityId: activityDeployment.id,
@@ -250,7 +250,7 @@ async function main() {
   const coordinatorPosition = await prisma.position.create({
     data: {
       code: 'COORD-PEDA',
-      title: 'Coordinatrice pedagogique',
+      title: 'Coordinatrice pédagogique',
       hierarchicalLevel: 'N3',
       domainId: pedagogyDomain.id,
       activityId: activityTraining.id,
@@ -260,7 +260,7 @@ async function main() {
   const volunteerPosition = await prisma.position.create({
     data: {
       code: 'BENEV-REF',
-      title: 'Benevole referent',
+      title: 'Bénévole référent',
       hierarchicalLevel: 'N4',
       domainId: opsDomain.id,
       activityId: activityDeployment.id,
@@ -270,7 +270,7 @@ async function main() {
   const traineePosition = await prisma.position.create({
     data: {
       code: 'STAG-OPS',
-      title: 'Stagiaire operations',
+      title: 'Stagiaire opérations',
       hierarchicalLevel: 'N5',
       domainId: opsDomain.id,
       activityId: activityDeployment.id,
@@ -326,7 +326,7 @@ async function main() {
   const orgIdf = await prisma.orgNode.create({
     data: {
       code: 'ORG-IDF',
-      name: 'Region Ile-de-France',
+      name: 'Région Île-de-France',
       type: 'REGION',
       parentId: orgNational.id,
       regionId: idf.id,
@@ -339,7 +339,7 @@ async function main() {
   const orgAura = await prisma.orgNode.create({
     data: {
       code: 'ORG-AURA',
-      name: 'Region AURA',
+      name: 'Région Auvergne-Rhône-Alpes',
       type: 'REGION',
       parentId: orgNational.id,
       regionId: aura.id,
@@ -352,7 +352,7 @@ async function main() {
   const orgPeda = await prisma.orgNode.create({
     data: {
       code: 'ORG-PEDA',
-      name: 'Pole pedagogique',
+      name: 'Pôle pédagogique',
       type: 'TEAM',
       parentId: orgAura.id,
       regionId: aura.id,
@@ -637,7 +637,7 @@ async function main() {
     data: {
       assetTag: 'MAT-002',
       name: 'iPhone SE',
-      assetType: 'Telephone',
+      assetType: 'Téléphone',
       serialNumber: 'IPHSE-2026',
       state: MaterialState.ASSIGNED,
     },
@@ -645,7 +645,7 @@ async function main() {
   const materialBadgeHugo = await prisma.materialAsset.create({
     data: {
       assetTag: 'MAT-003',
-      name: 'Badge acces Bordeaux',
+      name: 'Badge d’accès Bordeaux',
       assetType: 'Badge',
       state: MaterialState.ASSIGNED,
     },
@@ -653,8 +653,8 @@ async function main() {
   const materialKeyLucie = await prisma.materialAsset.create({
     data: {
       assetTag: 'MAT-004',
-      name: 'Cle local regional',
-      assetType: 'Cle',
+      name: 'Clé du local régional',
+      assetType: 'Clé',
       state: MaterialState.ASSIGNED,
     },
   });
@@ -719,10 +719,10 @@ async function main() {
 
   const softwareAssignments = await Promise.all([
     prisma.softwareAssignment.create({ data: { personId: personMap.get('Thomas Petit')!.id, resourceId: office365.id, status: AccessStatus.ACTIVE, startDate: new Date('2025-01-07T08:00:00.000Z') } }),
-    prisma.softwareAssignment.create({ data: { personId: personMap.get('Thomas Petit')!.id, resourceId: lms.id, status: AccessStatus.ACTIVE, startDate: new Date('2025-01-07T08:00:00.000Z'), endDate: new Date('2026-04-15T17:00:00.000Z'), justification: 'Acces pedagogique en renouvellement' } }),
+    prisma.softwareAssignment.create({ data: { personId: personMap.get('Thomas Petit')!.id, resourceId: lms.id, status: AccessStatus.ACTIVE, startDate: new Date('2025-01-07T08:00:00.000Z'), endDate: new Date('2026-04-15T17:00:00.000Z'), justification: 'Accès pédagogique en renouvellement' } }),
     prisma.softwareAssignment.create({ data: { personId: personMap.get('Claire Robert')!.id, resourceId: sirh.id, status: AccessStatus.ACTIVE, startDate: new Date('2024-02-01T08:00:00.000Z') } }),
     prisma.softwareAssignment.create({ data: { personId: personMap.get('Karim Benali')!.id, resourceId: helpdesk.id, status: AccessStatus.ACTIVE, startDate: new Date('2024-02-15T08:00:00.000Z') } }),
-    prisma.softwareAssignment.create({ data: { personId: personMap.get('Hugo Bernard')!.id, resourceId: office365.id, status: AccessStatus.REVOKED, startDate: new Date('2023-09-01T08:00:00.000Z'), endDate: new Date('2026-04-20T17:00:00.000Z'), justification: 'Revocation programmee dans le cadre du depart' } }),
+    prisma.softwareAssignment.create({ data: { personId: personMap.get('Hugo Bernard')!.id, resourceId: office365.id, status: AccessStatus.REVOKED, startDate: new Date('2023-09-01T08:00:00.000Z'), endDate: new Date('2026-04-20T17:00:00.000Z'), justification: 'Révocation programmée dans le cadre du départ' } }),
   ]);
 
   await prisma.accessHistory.createMany({
@@ -734,9 +734,9 @@ async function main() {
   });
 
   const teamsRh = await prisma.informationResource.create({ data: { name: 'Teams Direction RH', slug: 'teams-rh', resourceType: 'Teams', owner: 'Direction RH' } });
-  const sharedPeda = await prisma.informationResource.create({ data: { name: 'Repertoire pedagogique', slug: 'shared-peda', resourceType: 'Dossier partage', owner: 'Pole pedagogique' } });
-  const mailingIdf = await prisma.informationResource.create({ data: { name: 'Liste diffusion IDF', slug: 'ld-idf', resourceType: 'Liste de diffusion', owner: 'Region Ile-de-France' } });
-  const financeShared = await prisma.informationResource.create({ data: { name: 'Finance - budget regional', slug: 'finance-budget', resourceType: 'Dossier partage', owner: 'Controle de gestion' } });
+  const sharedPeda = await prisma.informationResource.create({ data: { name: 'Répertoire pédagogique', slug: 'shared-peda', resourceType: 'Dossier partagé', owner: 'Pôle pédagogique' } });
+  const mailingIdf = await prisma.informationResource.create({ data: { name: 'Liste de diffusion IDF', slug: 'ld-idf', resourceType: 'Liste de diffusion', owner: 'Région Île-de-France' } });
+  const financeShared = await prisma.informationResource.create({ data: { name: 'Finance - budget régional', slug: 'finance-budget', resourceType: 'Dossier partagé', owner: 'Contrôle de gestion' } });
 
   const informationAssignments = await Promise.all([
     prisma.informationAssignment.create({ data: { personId: personMap.get('Claire Robert')!.id, resourceId: teamsRh.id, status: AccessStatus.ACTIVE, startDate: new Date('2024-02-01T08:00:00.000Z') } }),
@@ -755,7 +755,7 @@ async function main() {
 
   const chartes = await prisma.documentCategory.create({ data: { code: 'CHARTE', label: 'Chartes internes' } });
   const engagements = await prisma.documentCategory.create({ data: { code: 'ENG', label: 'Engagements' } });
-  const procedures = await prisma.documentCategory.create({ data: { code: 'PROC', label: 'Procedures' } });
+  const procedures = await prisma.documentCategory.create({ data: { code: 'PROC', label: 'Procédures' } });
 
   const charteItVersion = await prisma.documentVersion.create({
     data: {
@@ -765,11 +765,11 @@ async function main() {
           title: 'Charte informatique UFCV',
           categoryId: chartes.id,
           valueType: DocumentValueType.ORGANISATIONNELLE,
-          consequenceText: 'Suspension temporaire des acces en cas de non-respect constate.',
+          consequenceText: 'Suspension temporaire des accès en cas de non-respect constaté.',
         },
       },
       versionLabel: 'v2026.1',
-      contentMarkdown: '# Charte informatique\n\nRespect des usages, de la confidentialite et des moyens numeriques UFCV.',
+      contentMarkdown: '# Charte informatique\n\nRespect des usages, de la confidentialité et des moyens numériques UFCV.',
       checksum: 'charte-it-v2026-1',
       publishedAt: new Date('2026-01-15T09:00:00.000Z'),
     },
@@ -782,14 +782,14 @@ async function main() {
       document: {
         create: {
           code: 'DOC-CONF',
-          title: 'Engagement de confidentialite',
+          title: 'Engagement de confidentialité',
           categoryId: engagements.id,
           valueType: DocumentValueType.INTERNE_MORALE,
-          consequenceText: 'Rappel formel au cadre de confidentialite interne et revue manageriale.',
+          consequenceText: 'Rappel formel au cadre de confidentialité interne et revue managériale.',
         },
       },
       versionLabel: 'v2026.2',
-      contentMarkdown: '# Confidentialite\n\nJe m engage a proteger les informations auxquelles j ai acces.',
+      contentMarkdown: '# Confidentialité\n\nJe m’engage à protéger les informations auxquelles j’ai accès.',
       checksum: 'eng-conf-v2026-2',
       publishedAt: new Date('2026-02-01T09:00:00.000Z'),
     },
@@ -802,13 +802,13 @@ async function main() {
       document: {
         create: {
           code: 'DOC-ONBOARD',
-          title: "Guide d'onboarding managers",
+          title: 'Guide d’intégration des managers',
           categoryId: procedures.id,
           valueType: DocumentValueType.ORGANISATIONNELLE,
         },
       },
       versionLabel: 'v2026.1',
-      contentMarkdown: "# Guide d'onboarding\n\nChecklist de prise de poste et points de vigilance.",
+      contentMarkdown: '# Guide d’intégration\n\nChecklist de prise de poste et points de vigilance.',
       checksum: 'guide-onboard-v2026-1',
       publishedAt: new Date('2026-03-01T09:00:00.000Z'),
     },
@@ -857,7 +857,7 @@ async function main() {
       signedAt: new Date('2026-03-10T11:30:00.000Z'),
       ipAddress: '127.0.0.1',
       userAgent: 'seed/browser',
-      acknowledgementText: 'Lecture et signature interne validees.',
+      acknowledgementText: 'Lecture et signature interne validées.',
     },
   });
 
@@ -867,13 +867,13 @@ async function main() {
       status: WorkflowStatus.EN_COURS,
       dueDate: new Date('2026-04-22T17:00:00.000Z'),
       completionRate: 50,
-      notes: 'Preparation de poste en cours pour le stage operations.',
+      notes: 'Préparation du poste en cours pour le stage opérations.',
       tasks: {
         create: [
-          { title: 'Creer le dossier RH', order: 1, status: WorkflowTaskStatus.DONE, completedAt: new Date('2026-04-03T09:00:00.000Z') },
-          { title: 'Preparer le poste et les acces', order: 2, status: WorkflowTaskStatus.IN_PROGRESS },
+          { title: 'Créer le dossier RH', order: 1, status: WorkflowTaskStatus.DONE, completedAt: new Date('2026-04-03T09:00:00.000Z') },
+          { title: 'Préparer le poste et les accès', order: 2, status: WorkflowTaskStatus.IN_PROGRESS },
           { title: 'Partager les documents internes', order: 3, status: WorkflowTaskStatus.TODO },
-          { title: "Planifier l'accueil manager", order: 4, status: WorkflowTaskStatus.TODO },
+          { title: 'Planifier l’accueil avec le responsable', order: 4, status: WorkflowTaskStatus.TODO },
         ],
       },
     },
@@ -885,37 +885,37 @@ async function main() {
       status: WorkflowStatus.EN_COURS,
       dueDate: new Date('2026-04-30T17:00:00.000Z'),
       completionRate: 60,
-      notes: 'Depart manager Bordeaux, revocations a finaliser.',
+      notes: 'Départ du responsable de Bordeaux, révocations à finaliser.',
       tasks: {
         create: [
           { title: 'Notifier la DSI', order: 1, status: WorkflowTaskStatus.DONE, completedAt: new Date('2026-04-02T09:00:00.000Z') },
-          { title: 'Revoquer les acces logiciels', order: 2, status: WorkflowTaskStatus.IN_PROGRESS },
-          { title: "Retirer les acces a l'information", order: 3, status: WorkflowTaskStatus.IN_PROGRESS },
-          { title: 'Recuperer badge et materiel', order: 4, status: WorkflowTaskStatus.TODO },
-          { title: 'Cloturer le dossier', order: 5, status: WorkflowTaskStatus.TODO },
+          { title: 'Révoquer les accès logiciels', order: 2, status: WorkflowTaskStatus.IN_PROGRESS },
+          { title: 'Retirer les accès à l’information', order: 3, status: WorkflowTaskStatus.IN_PROGRESS },
+          { title: 'Récupérer le badge et le matériel', order: 4, status: WorkflowTaskStatus.TODO },
+          { title: 'Clôturer le dossier', order: 5, status: WorkflowTaskStatus.TODO },
         ],
       },
     },
   });
 
   const connectors = await Promise.all([
-    prisma.externalConnectorConfig.create({ data: { code: 'local-auth', name: 'Local Auth Provider', type: ConnectorType.AUTH, status: ConnectorStatus.ACTIVE, baseUrl: 'local://auth', config: { strategy: 'local-demo' } } }),
-    prisma.externalConnectorConfig.create({ data: { code: 'mock-directory', name: 'Mock Directory Sync', type: ConnectorType.DIRECTORY, status: ConnectorStatus.ACTIVE, baseUrl: 'mock://directory', config: { adapter: 'mock' } } }),
-    prisma.externalConnectorConfig.create({ data: { code: 'mock-graph', name: 'Mock Microsoft Graph', type: ConnectorType.GRAPH, status: ConnectorStatus.INACTIVE, baseUrl: 'mock://graph', config: { adapter: 'mock' } } }),
+    prisma.externalConnectorConfig.create({ data: { code: 'local-auth', name: 'Fournisseur d’authentification local', type: ConnectorType.AUTH, status: ConnectorStatus.ACTIVE, baseUrl: 'local://auth', config: { strategy: 'local-demo' } } }),
+    prisma.externalConnectorConfig.create({ data: { code: 'mock-directory', name: 'Synchronisation d’annuaire simulée', type: ConnectorType.DIRECTORY, status: ConnectorStatus.ACTIVE, baseUrl: 'mock://directory', config: { adapter: 'mock' } } }),
+    prisma.externalConnectorConfig.create({ data: { code: 'mock-graph', name: 'Microsoft Graph simulé', type: ConnectorType.GRAPH, status: ConnectorStatus.INACTIVE, baseUrl: 'mock://graph', config: { adapter: 'mock' } } }),
   ]);
 
   await Promise.all([
-    prisma.syncJob.create({ data: { connectorId: connectors[1].id, name: 'Synchronisation annuaire demo', direction: SyncDirection.BIDIRECTIONAL, status: ConnectorStatus.ACTIVE, lastStartedAt: new Date('2026-04-06T09:00:00.000Z'), lastEndedAt: new Date('2026-04-06T09:02:00.000Z'), result: { updatedPeople: 4 } } }),
-    prisma.syncJob.create({ data: { connectorId: connectors[2].id, name: 'Provisioning Graph mock', direction: SyncDirection.OUTBOUND, status: ConnectorStatus.INACTIVE } }),
+    prisma.syncJob.create({ data: { connectorId: connectors[1].id, name: 'Synchronisation d’annuaire de démonstration', direction: SyncDirection.BIDIRECTIONAL, status: ConnectorStatus.ACTIVE, lastStartedAt: new Date('2026-04-06T09:00:00.000Z'), lastEndedAt: new Date('2026-04-06T09:02:00.000Z'), result: { updatedPeople: 4 } } }),
+    prisma.syncJob.create({ data: { connectorId: connectors[2].id, name: 'Provisionnement Graph simulé', direction: SyncDirection.OUTBOUND, status: ConnectorStatus.INACTIVE } }),
   ]);
 
   await prisma.notification.createMany({
     data: [
-      { userId: userMap.get('user_demo')!.id, title: 'Document a signer', body: 'La charte informatique UFCV attend votre signature avant le 20 avril 2026.', type: NotificationType.ACTION_REQUIRED, isRead: false },
-      { userId: userMap.get('manager_demo')!.id, title: 'Onboarding en cours', body: 'Le dossier de Nina Lopez est a 50% et necessite une validation manager.', type: NotificationType.INFO, isRead: false },
-      { userId: userMap.get('dpmo_admin')!.id, title: "Acces logiciel proche de l'expiration", body: 'La licence LMS de Thomas Petit expire dans moins de 10 jours.', type: NotificationType.WARNING, isRead: false },
-      { userId: userMap.get('rh_admin')!.id, title: 'Offboarding a finaliser', body: 'Le depart de Hugo Bernard reste ouvert avec du materiel a recuperer.', type: NotificationType.ACTION_REQUIRED, isRead: false },
-      { userId: userMap.get('external_demo')!.id, title: 'Acces externe valide', body: "Votre acces restreint reste actif jusqu'au 31 decembre 2026.", type: NotificationType.SUCCESS, isRead: true, readAt: new Date('2026-04-01T08:00:00.000Z') },
+      { userId: userMap.get('user_demo')!.id, title: 'Document à signer', body: 'La charte informatique UFCV attend votre signature avant le 20 avril 2026.', type: NotificationType.ACTION_REQUIRED, isRead: false },
+      { userId: userMap.get('manager_demo')!.id, title: 'Arrivée en cours', body: 'Le dossier de Nina Lopez est à 50 % et nécessite une validation managériale.', type: NotificationType.INFO, isRead: false },
+      { userId: userMap.get('dpmo_admin')!.id, title: 'Accès logiciel proche de l’expiration', body: 'La licence LMS de Thomas Petit expire dans moins de 10 jours.', type: NotificationType.WARNING, isRead: false },
+      { userId: userMap.get('rh_admin')!.id, title: 'Départ à finaliser', body: 'Le départ de Hugo Bernard reste ouvert avec du matériel à récupérer.', type: NotificationType.ACTION_REQUIRED, isRead: false },
+      { userId: userMap.get('external_demo')!.id, title: 'Accès externe validé', body: 'Votre accès restreint reste actif jusqu’au 31 décembre 2026.', type: NotificationType.SUCCESS, isRead: true, readAt: new Date('2026-04-01T08:00:00.000Z') },
     ],
   });
 
@@ -930,8 +930,8 @@ async function main() {
     ],
   });
 
-  console.log('Seed termine.');
-  console.log(`Comptes demo disponibles (mot de passe: ${demoPassword})`);
+  console.log('Seed terminé.');
+  console.log(`Comptes de démonstration disponibles (mot de passe : ${demoPassword})`);
   console.log('- superadmin');
   console.log('- rh_admin');
   console.log('- dpmo_admin');

@@ -3,6 +3,7 @@ import { Fragment, type PropsWithChildren, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useTheme } from '@/app/providers/ThemeProvider';
+import { getAuditActionLabel, getDisplayLabel, getEntityLabel } from '@/lib/labels';
 
 type Column<T> = {
   header: string;
@@ -13,9 +14,9 @@ export const ThemeToggle = () => {
   const { mode, setMode } = useTheme();
 
   return (
-    <div className="theme-toggle" aria-label="Changer le theme">
+    <div className="theme-toggle" aria-label="Changer le thème">
       {[
-        { value: 'system', label: 'Systeme', icon: <SunMoon size={16} /> },
+        { value: 'system', label: 'Système', icon: <SunMoon size={16} /> },
         { value: 'light', label: 'Clair', icon: <SunMedium size={16} /> },
         { value: 'dark', label: 'Sombre', icon: <MoonStar size={16} /> },
       ].map((item) => (
@@ -58,19 +59,31 @@ export const StatusBadge = ({ value }: { value: string }) => {
     normalized.includes('active') ||
     normalized.includes('signe') ||
     normalized.includes('done') ||
-    normalized.includes('termine')
+    normalized.includes('termine') ||
+    normalized.includes('available') ||
+    normalized.includes('success') ||
+    normalized.includes('lue') ||
+    normalized.includes('returned')
       ? 'success'
       : normalized.includes('warning') ||
           normalized.includes('expire') ||
           normalized.includes('transition') ||
           normalized.includes('en_cours') ||
-          normalized.includes('a_signer')
+          normalized.includes('en_attente') ||
+          normalized.includes('a_signer') ||
+          normalized.includes('a_lire') ||
+          normalized.includes('a_traiter') ||
+          normalized.includes('assigned') ||
+          normalized.includes('action_required')
         ? 'warning'
-        : normalized.includes('revoke') || normalized.includes('sortie') || normalized.includes('bloque')
+        : normalized.includes('revoke') ||
+            normalized.includes('sortie') ||
+            normalized.includes('bloque') ||
+            normalized.includes('error')
           ? 'danger'
           : 'neutral';
 
-  return <span className={`status-badge ${className}`}>{value.replaceAll('_', ' ')}</span>;
+  return <span className={`status-badge ${className}`}>{getDisplayLabel(value)}</span>;
 };
 
 export const MetricCard = ({
@@ -120,7 +133,7 @@ export const ErrorState = ({
     </div>
     {onRetry ? (
       <button type="button" className="secondary-button" onClick={onRetry}>
-        Reessayer
+        Réessayer
       </button>
     ) : null}
   </div>
@@ -129,8 +142,8 @@ export const ErrorState = ({
 export const DataTable = <T,>({
   columns,
   rows,
-  emptyTitle = 'Aucune donnee',
-  emptyMessage = 'Aucun element ne correspond aux filtres.',
+  emptyTitle = 'Aucune donnée',
+  emptyMessage = 'Aucun élément ne correspond aux filtres.',
 }: {
   columns: Column<T>[];
   rows: T[];
@@ -196,7 +209,7 @@ export const Panel = ({
 
 export const OrgChart = ({ nodes }: { nodes: Array<Record<string, unknown>> }) => {
   if (!nodes.length) {
-    return <EmptyState title="Aucun noeud" message="L'organigramme est vide pour les filtres courants." />;
+    return <EmptyState title="Aucun nœud" message="L’organigramme est vide pour les filtres en cours." />;
   }
 
   return (
@@ -215,9 +228,9 @@ const OrgTreeNode = ({ node }: { node: Record<string, unknown> }) => {
     <div className="org-node">
       <div className="org-node-card">
         <strong>{String(node.name)}</strong>
-        <span>{String(node.type)}</span>
+        <span>{getDisplayLabel(String(node.type))}</span>
         <small>
-          {(node.region as string | null) ?? 'Sans region'} · {(node.peopleCount as number | null) ?? 0} personnes
+          {(node.region as string | null) ?? 'Sans région'} · {(node.peopleCount as number | null) ?? 0} personnes
         </small>
       </div>
       {children.length ? (
@@ -238,14 +251,17 @@ export const AuditTimeline = ({ items }: { items: Array<Record<string, unknown>>
         <article className="timeline-item" key={String(item.id)}>
           <div className="timeline-dot" />
           <div>
-            <strong>{String(item.action)}</strong>
-            <p>{String(item.entityType)}</p>
+            <strong>{getAuditActionLabel(String(item.action))}</strong>
+            <p>
+              {getEntityLabel(String(item.entityType))}
+              {item.actorName ? ` · ${String(item.actorName)}` : ''}
+            </p>
             <small>{new Date(String(item.createdAt)).toLocaleString('fr-FR')}</small>
           </div>
         </article>
       ))
     ) : (
-      <EmptyState title="Aucune action" message="Aucun evenement d'audit disponible." />
+      <EmptyState title="Aucune action" message="Aucun événement d’audit n’est disponible." />
     )}
   </div>
 );
@@ -282,8 +298,8 @@ export const SignaturePanel = ({
     <div>
       <strong>Signature interne</strong>
       <p>
-        Cette signature confirme la lecture et l'engagement interne. Elle ne constitue pas une
-        signature electronique qualifiee.
+        Cette signature confirme la lecture et l’engagement interne. Elle ne constitue pas une
+        signature électronique qualifiée.
       </p>
     </div>
     <button type="button" className="primary-button" disabled={!canSign || isBusy} onClick={onSign}>
@@ -293,7 +309,7 @@ export const SignaturePanel = ({
 );
 
 export const NotificationBell = ({ count }: { count: number }) => (
-  <Link className="notification-bell" to="/notifications">
+  <Link className="notification-bell" to="/notifications" aria-label="Notifications">
     <Bell size={18} />
     {count ? <span>{count}</span> : null}
   </Link>

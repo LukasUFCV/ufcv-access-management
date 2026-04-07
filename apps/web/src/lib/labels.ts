@@ -1,0 +1,113 @@
+const DISPLAY_LABELS: Record<string, string> = {
+  ACCESS_PROVISIONING: 'Provisionnement des accès',
+  ACTIVE: 'Actif',
+  ACTION_REQUIRED: 'Action requise',
+  ADHERENT: 'Adhérent',
+  ARCHIVEE: 'Archivé',
+  ASSIGNED: 'Attribué',
+  AUTH: 'Authentification',
+  AVAILABLE: 'Disponible',
+  A_LIRE: 'À lire',
+  A_SIGNER: 'À signer',
+  A_TRAITER: 'À traiter',
+  BENEVOLE: 'Bénévole',
+  BIDIRECTIONAL: 'Bidirectionnelle',
+  BLOQUE: 'Bloqué',
+  BROUILLON: 'Brouillon',
+  DEPARTMENT: 'Département',
+  DIRECTORY: 'Annuaire',
+  DONE: 'Terminé',
+  DSI_ADMIN: 'Administration DSI / DPMO',
+  EN_ATTENTE: 'En attente',
+  EN_COURS: 'En cours',
+  ERROR: 'Erreur',
+  EXPIRED: 'Expiré',
+  EXPIRE: 'Expiré',
+  EXTERNAL_USER: 'Utilisateur externe',
+  GRAPH: 'Microsoft Graph',
+  INFO: 'Information',
+  INACTIVE: 'Inactif',
+  INBOUND: 'Entrante',
+  IN_PROGRESS: 'En cours',
+  INTERVENANT_EXTERNE: 'Intervenant externe',
+  LUE: 'Lue',
+  MANAGER: 'Responsable',
+  NOTIFICATIONS: 'Notifications',
+  OUTBOUND: 'Sortante',
+  PENDING: 'En attente',
+  PREPARATION: 'Préparation',
+  REGION: 'Région',
+  REMPLACE: 'Remplacé',
+  REVOKED: 'Révoqué',
+  RETURNED: 'Restitué',
+  RH_ADMIN: 'Administration RH',
+  ROOT: 'Racine',
+  SALARIE: 'Salarié',
+  SIGNE: 'Signé',
+  SORTIE: 'Sortie',
+  STAGIAIRE: 'Stagiaire',
+  STANDARD_USER: 'Utilisateur standard',
+  SUCCESS: 'Succès',
+  SUPER_ADMIN: 'Super-administrateur',
+  TEAM: 'Équipe',
+  TERMINE: 'Terminé',
+  TODO: 'À faire',
+  TRANSITION: 'Transition',
+  VOLONTAIRE: 'Volontaire',
+  WARNING: 'Alerte',
+};
+
+const AUDIT_ACTION_LABELS: Record<string, string> = {
+  'assets.assign': 'Attribution de matériel',
+  'assets.return': 'Restitution de matériel',
+  'auth.login': 'Connexion',
+  'auth.logout': 'Déconnexion',
+  'documents.assign': 'Attribution d’un document',
+  'documents.create': 'Création d’un document',
+  'documents.sign': 'Signature d’un document',
+  'information.assign': 'Attribution d’un accès à l’information',
+  'information.update': 'Mise à jour d’un accès à l’information',
+  'people.archive': 'Archivage d’une personne',
+  'people.create': 'Création d’une personne',
+  'people.update': 'Mise à jour d’une personne',
+  'software.assign': 'Attribution logicielle',
+  'software.update': 'Mise à jour d’une attribution logicielle',
+  'workflow.offboarding.create': 'Création d’un parcours de départ',
+  'workflow.offboarding.update': 'Mise à jour d’un parcours de départ',
+  'workflow.onboarding.create': 'Création d’un parcours d’arrivée',
+  'workflow.onboarding.update': 'Mise à jour d’un parcours d’arrivée',
+};
+
+const ENTITY_LABELS: Record<string, string> = {
+  Document: 'Document',
+  DocumentSignature: 'Signature de document',
+  InformationAssignment: 'Attribution d’accès à l’information',
+  MaterialAssignment: 'Attribution de matériel',
+  OffboardingCase: 'Parcours de départ',
+  OnboardingCase: 'Parcours d’arrivée',
+  Person: 'Personne',
+  SoftwareAssignment: 'Attribution logicielle',
+  User: 'Utilisateur',
+};
+
+const toSentenceCase = (value: string) =>
+  value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
+
+const humanizeValue = (value: string) => {
+  const withSpaces = value
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replaceAll('.', ' ')
+    .replaceAll('_', ' ')
+    .toLowerCase();
+
+  return toSentenceCase(withSpaces);
+};
+
+export const getDisplayLabel = (value: string) => DISPLAY_LABELS[value] ?? humanizeValue(value);
+
+export const getAuditActionLabel = (value: string) =>
+  AUDIT_ACTION_LABELS[value] ?? humanizeValue(value);
+
+export const getEntityLabel = (value: string) => ENTITY_LABELS[value] ?? humanizeValue(value);
+
+export const getBooleanLabel = (value: boolean) => (value ? 'Oui' : 'Non');

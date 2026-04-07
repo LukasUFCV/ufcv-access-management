@@ -18,6 +18,7 @@ import {
   StatusBadge,
 } from '@/components/ui';
 import { api, getErrorMessage } from '@/lib/api';
+import { getBooleanLabel, getDisplayLabel } from '@/lib/labels';
 
 type RemoteState<T> = {
   data: T;
@@ -97,12 +98,12 @@ export const LoginPage = () => {
           <span className="brand-mark" />
           <div>
             <h1>Habilitations UFCV</h1>
-            <p>Gestion des droits, acces, documents et workflows de cycle de vie.</p>
+            <p>Gestion des droits, des accès, des documents et des parcours de cycle de vie.</p>
           </div>
         </div>
 
         <form className="stack-form" onSubmit={handleSubmit}>
-          <FormField label="Login">
+          <FormField label="Identifiant">
             <input
               value={form.login}
               onChange={(event) => setForm((current) => ({ ...current, login: event.target.value }))}
@@ -126,7 +127,7 @@ export const LoginPage = () => {
         </form>
 
         <div className="demo-accounts">
-          <strong>Comptes demo</strong>
+          <strong>Comptes de démonstration</strong>
           <p>`superadmin`, `rh_admin`, `dpmo_admin`, `manager_demo`, `user_demo`</p>
         </div>
       </main>
@@ -156,16 +157,16 @@ export const DashboardPage = () => {
     <div className="page-stack">
       <PageIntro
         title="Tableau de bord"
-        description="Vue synthétique de l'activité RH, des acces et des obligations internes."
+        description="Vue synthétique de l’activité RH, des accès et des obligations internes."
       />
       {summary.error ? <ErrorState message={summary.error} onRetry={() => void summary.reload()} /> : null}
       <div className="metrics-grid">
         <MetricCard label="Personnes actives" value={summary.data.activePeople ?? 0} />
-        <MetricCard label="Onboardings en cours" value={summary.data.onboardingsInProgress ?? 0} />
-        <MetricCard label="Offboardings en cours" value={summary.data.offboardingsInProgress ?? 0} />
-        <MetricCard label="Documents a signer" value={summary.data.documentsPendingSignature ?? 0} />
-        <MetricCard label="Acces expirant bientot" value={summary.data.expiringAccesses ?? 0} />
-        <MetricCard label="Materiel a restituer" value={summary.data.materialPendingReturn ?? 0} />
+        <MetricCard label="Arrivées en cours" value={summary.data.onboardingsInProgress ?? 0} />
+        <MetricCard label="Départs en cours" value={summary.data.offboardingsInProgress ?? 0} />
+        <MetricCard label="Documents à signer" value={summary.data.documentsPendingSignature ?? 0} />
+        <MetricCard label="Accès expirant bientôt" value={summary.data.expiringAccesses ?? 0} />
+        <MetricCard label="Matériel à restituer" value={summary.data.materialPendingReturn ?? 0} />
       </div>
     </div>
   );
@@ -216,17 +217,17 @@ export const PeoplePage = () => {
 
   return (
     <div className="page-stack">
-      <PageIntro title="Annuaire" description="Recherche, consultation et création des dossiers personnes." />
+      <PageIntro title="Annuaire" description="Recherche, consultation et création des dossiers des personnes." />
       <Panel title="Filtres">
         <FiltersPanel>
-          <SearchBar value={search} onChange={setSearch} placeholder="Nom, email, identifiant…" />
+          <SearchBar value={search} onChange={setSearch} placeholder="Nom, e-mail ou identifiant…" />
           <select value={status} onChange={(event) => setStatus(event.target.value)}>
             <option value="">Tous les statuts</option>
-            <option value="PREPARATION">Preparation</option>
-            <option value="ACTIVE">Active</option>
+            <option value="PREPARATION">Préparation</option>
+            <option value="ACTIVE">Actif</option>
             <option value="TRANSITION">Transition</option>
             <option value="SORTIE">Sortie</option>
-            <option value="ARCHIVEE">Archivee</option>
+            <option value="ARCHIVEE">Archivé</option>
           </select>
         </FiltersPanel>
       </Panel>
@@ -248,14 +249,14 @@ export const PeoplePage = () => {
             { header: 'Type', render: (item) => <StatusBadge value={String(item.actorType ?? '')} /> },
             { header: 'Statut', render: (item) => <StatusBadge value={String(item.status ?? '')} /> },
             { header: 'Poste', render: (item) => item.position ?? '' },
-            { header: 'Region', render: (item) => item.region ?? '' },
+            { header: 'Région', render: (item) => item.region ?? '' },
           ]}
         />
       </Panel>
 
-      <Panel title="Creer une personne">
+      <Panel title="Créer une personne">
         <form className="stack-form compact-grid" onSubmit={(event) => void createPerson(event)}>
-          <FormField label="Prenom">
+          <FormField label="Prénom">
             <input value={form.firstName} onChange={(event) => setForm((current) => ({ ...current, firstName: event.target.value }))} />
           </FormField>
           <FormField label="Nom">
@@ -264,12 +265,12 @@ export const PeoplePage = () => {
           <FormField label="Identifiant">
             <input value={form.sessionIdentifier} onChange={(event) => setForm((current) => ({ ...current, sessionIdentifier: event.target.value }))} />
           </FormField>
-          <FormField label="Email pro">
+          <FormField label="E-mail professionnel">
             <input value={form.emailProfessional} onChange={(event) => setForm((current) => ({ ...current, emailProfessional: event.target.value }))} />
           </FormField>
-          <FormField label="Type d'acteur">
+          <FormField label="Type d’acteur">
             <select value={form.actorTypeId} onChange={(event) => setForm((current) => ({ ...current, actorTypeId: event.target.value }))}>
-              <option value="">Selectionner</option>
+              <option value="">Sélectionner</option>
               {actorTypes.data.map((item) => (
                 <option key={item.id} value={item.id}>{item.label}</option>
               ))}
@@ -277,12 +278,12 @@ export const PeoplePage = () => {
           </FormField>
           <FormField label="Statut">
             <select value={form.status} onChange={(event) => setForm((current) => ({ ...current, status: event.target.value }))}>
-              <option value="PREPARATION">Preparation</option>
-              <option value="ACTIVE">Active</option>
+              <option value="PREPARATION">Préparation</option>
+              <option value="ACTIVE">Actif</option>
               <option value="TRANSITION">Transition</option>
             </select>
           </FormField>
-          <button type="submit" className="primary-button">Creer</button>
+          <button type="submit" className="primary-button">Créer</button>
         </form>
       </Panel>
     </div>
@@ -302,14 +303,14 @@ export const PersonDetailPage = () => {
 
   return (
     <div className="page-stack">
-      <PageIntro title={`${person.data.firstName ?? ''} ${person.data.lastName ?? ''}`} description="Identite, rattachements, acces, documents et traces d'audit." />
+      <PageIntro title={`${person.data.firstName ?? ''} ${person.data.lastName ?? ''}`} description="Identité, rattachements, accès, documents et traces d’audit." />
       {person.error ? <ErrorState message={person.error} onRetry={() => void person.reload()} /> : null}
       <div className="content-grid two-columns">
-        <Panel title="Identite">
+        <Panel title="Identité">
           <dl className="definition-list">
             <div><dt>Email</dt><dd>{person.data.emailProfessional}</dd></div>
             <div><dt>Poste</dt><dd>{person.data.position}</dd></div>
-            <div><dt>Manager</dt><dd>{person.data.managerName ?? 'Non renseigne'}</dd></div>
+            <div><dt>Responsable</dt><dd>{person.data.managerName ?? 'Non renseigné'}</dd></div>
             <div><dt>Statut</dt><dd><StatusBadge value={person.data.status ?? '-'} /></dd></div>
           </dl>
         </Panel>
@@ -325,10 +326,10 @@ export const PersonDetailPage = () => {
         </Panel>
       </div>
       <div className="content-grid two-columns">
-        <Panel title="Materiel">
+        <Panel title="Matériel">
           <DataTable rows={accesses.data.material ?? []} columns={[
-            { header: 'Materiel', render: (item) => item.assetName },
-            { header: 'Tag', render: (item) => item.assetTag },
+            { header: 'Matériel', render: (item) => item.assetName },
+            { header: 'Référence', render: (item) => item.assetTag },
             { header: 'Statut', render: (item) => <StatusBadge value={String(item.status ?? '')} /> },
           ]} />
         </Panel>
@@ -340,7 +341,7 @@ export const PersonDetailPage = () => {
           ]} />
         </Panel>
       </div>
-      <Panel title="Audit recent">
+      <Panel title="Audit récent">
         <AuditTimeline items={audit.data.items} />
       </Panel>
     </div>
@@ -361,7 +362,7 @@ export const OrganizationPage = () => {
   return (
     <div className="page-stack">
       <PageIntro title="Organisation" description="Vue hiérarchique, référentiels et organigramme filtrable." />
-      <Panel title="Filtre d'organigramme">
+      <Panel title="Filtre de l’organigramme">
         <FiltersPanel>
           <select value={domainId} onChange={(event) => setDomainId(event.target.value)}>
             <option value="">Tous les domaines</option>
@@ -379,7 +380,7 @@ export const OrganizationPage = () => {
         <Panel title="Domaines">
           <DataTable rows={domains.data} columns={[{ header: 'Nom', render: (item) => item.name }]} />
         </Panel>
-        <Panel title="Activites">
+        <Panel title="Activités">
           <DataTable rows={activities.data} columns={[{ header: 'Nom', render: (item) => item.name }, { header: 'Domaine', render: (item) => String((item as { domain?: { name?: string } }).domain?.name ?? '-') }]} />
         </Panel>
         <Panel title="Postes">
@@ -415,14 +416,14 @@ export const MaterialPage = () => {
 
   return (
     <div className="page-stack">
-      <PageIntro title="Materiel" description="Gestion du parc, attributions et restitutions." />
-      <Panel title="Parc materiel">
+      <PageIntro title="Matériel" description="Gestion du parc, des attributions et des restitutions." />
+      <Panel title="Parc matériel">
         <DataTable
           rows={assets.data}
           columns={[
-            { header: 'Materiel', render: (item) => String(item.name) },
+            { header: 'Matériel', render: (item) => String(item.name) },
             { header: 'Type', render: (item) => String(item.assetType) },
-            { header: 'Etat', render: (item) => <StatusBadge value={String(item.state)} /> },
+            { header: 'État', render: (item) => <StatusBadge value={String(item.state)} /> },
             {
               header: 'Action',
               render: (item) =>
@@ -432,7 +433,7 @@ export const MaterialPage = () => {
                     className="secondary-button"
                     onClick={() => void api.post(`/assets/material/${String(item.id)}/return`).then(() => assets.reload())}
                   >
-                    Retour
+                    Restituer
                   </button>
                 ) : (
                   'Disponible'
@@ -442,19 +443,19 @@ export const MaterialPage = () => {
         />
       </Panel>
       <div className="content-grid two-columns">
-        <Panel title="Ajouter un materiel">
+        <Panel title="Ajouter un équipement">
           <form className="stack-form" onSubmit={(event) => void createAsset(event)}>
-            <FormField label="Tag"><input value={assetForm.assetTag} onChange={(event) => setAssetForm((current) => ({ ...current, assetTag: event.target.value }))} /></FormField>
+            <FormField label="Référence"><input value={assetForm.assetTag} onChange={(event) => setAssetForm((current) => ({ ...current, assetTag: event.target.value }))} /></FormField>
             <FormField label="Nom"><input value={assetForm.name} onChange={(event) => setAssetForm((current) => ({ ...current, name: event.target.value }))} /></FormField>
             <FormField label="Type"><input value={assetForm.assetType} onChange={(event) => setAssetForm((current) => ({ ...current, assetType: event.target.value }))} /></FormField>
             <button type="submit" className="primary-button">Ajouter</button>
           </form>
         </Panel>
-        <Panel title="Attribuer un materiel">
+        <Panel title="Attribuer un équipement">
           <form className="stack-form" onSubmit={(event) => void assignAsset(event)}>
-            <FormField label="Materiel">
+            <FormField label="Matériel">
               <select value={assignmentForm.assetId} onChange={(event) => setAssignmentForm((current) => ({ ...current, assetId: event.target.value }))}>
-                <option value="">Selectionner</option>
+                <option value="">Sélectionner</option>
                 {assets.data.map((item) => (
                   <option key={String(item.id ?? '')} value={String(item.id ?? '')}>{String(item.name ?? '')}</option>
                 ))}
@@ -462,13 +463,13 @@ export const MaterialPage = () => {
             </FormField>
             <FormField label="Personne">
               <select value={assignmentForm.personId} onChange={(event) => setAssignmentForm((current) => ({ ...current, personId: event.target.value }))}>
-                <option value="">Selectionner</option>
+                <option value="">Sélectionner</option>
                 {people.data.map((item) => (
                   <option key={item.id ?? ''} value={item.id ?? ''}>{item.firstName ?? ''} {item.lastName ?? ''}</option>
                 ))}
               </select>
             </FormField>
-            <FormField label="Date de restitution cible">
+            <FormField label="Date cible de restitution">
               <input type="datetime-local" value={assignmentForm.dueBackAt} onChange={(event) => setAssignmentForm((current) => ({ ...current, dueBackAt: event.target.value }))} />
             </FormField>
             <button type="submit" className="primary-button">Attribuer</button>
@@ -487,7 +488,7 @@ export const SoftwarePage = () => {
 
   return (
     <div className="page-stack">
-      <PageIntro title="Acces logiciels" description="Attributions, renouvellements et revocations des licences et outils metier." />
+      <PageIntro title="Accès logiciels" description="Attributions, renouvellements et révocations des licences et outils métier." />
       <Panel title="Ressources logicielles">
         <DataTable rows={resources.data} columns={[
           { header: 'Ressource', render: (item) => String(item.name) },
@@ -510,7 +511,7 @@ export const SoftwarePage = () => {
             <button type="submit" className="primary-button">Ajouter</button>
           </form>
         </Panel>
-        <Panel title="Creer une attribution">
+        <Panel title="Créer une attribution">
           <form className="stack-form" onSubmit={(event) => {
             event.preventDefault();
             void api.post('/software-assignments', assignmentForm).then(() => {
@@ -520,17 +521,17 @@ export const SoftwarePage = () => {
           }}>
             <FormField label="Ressource">
               <select value={assignmentForm.resourceId} onChange={(event) => setAssignmentForm((current) => ({ ...current, resourceId: event.target.value }))}>
-                <option value="">Selectionner</option>
+                <option value="">Sélectionner</option>
                 {resources.data.map((item) => <option key={String(item.id ?? '')} value={String(item.id ?? '')}>{String(item.name ?? '')}</option>)}
               </select>
             </FormField>
             <FormField label="Personne">
               <select value={assignmentForm.personId} onChange={(event) => setAssignmentForm((current) => ({ ...current, personId: event.target.value }))}>
-                <option value="">Selectionner</option>
+                <option value="">Sélectionner</option>
                 {people.data.map((item) => <option key={item.id ?? ''} value={item.id ?? ''}>{item.firstName ?? ''} {item.lastName ?? ''}</option>)}
               </select>
             </FormField>
-            <FormField label="Debut"><input type="datetime-local" value={assignmentForm.startDate} onChange={(event) => setAssignmentForm((current) => ({ ...current, startDate: event.target.value }))} /></FormField>
+            <FormField label="Début"><input type="datetime-local" value={assignmentForm.startDate} onChange={(event) => setAssignmentForm((current) => ({ ...current, startDate: event.target.value }))} /></FormField>
             <FormField label="Fin"><input type="datetime-local" value={assignmentForm.endDate} onChange={(event) => setAssignmentForm((current) => ({ ...current, endDate: event.target.value }))} /></FormField>
             <button type="submit" className="primary-button">Attribuer</button>
           </form>
@@ -548,7 +549,7 @@ export const InformationPage = () => {
 
   return (
     <div className="page-stack">
-      <PageIntro title="Acces information" description="Groupes Teams, listes de diffusion et espaces documentaires." />
+      <PageIntro title="Accès aux informations" description="Groupes Teams, listes de diffusion et espaces documentaires." />
       <Panel title="Ressources informationnelles">
         <DataTable rows={resources.data} columns={[
           { header: 'Ressource', render: (item) => String(item.name) },
@@ -571,7 +572,7 @@ export const InformationPage = () => {
             <button type="submit" className="primary-button">Ajouter</button>
           </form>
         </Panel>
-        <Panel title="Creer une attribution">
+        <Panel title="Créer une attribution">
           <form className="stack-form" onSubmit={(event) => {
             event.preventDefault();
             void api.post('/information-assignments', assignmentForm).then(() => {
@@ -581,17 +582,17 @@ export const InformationPage = () => {
           }}>
             <FormField label="Ressource">
               <select value={assignmentForm.resourceId} onChange={(event) => setAssignmentForm((current) => ({ ...current, resourceId: event.target.value }))}>
-                <option value="">Selectionner</option>
+                <option value="">Sélectionner</option>
                 {resources.data.map((item) => <option key={String(item.id ?? '')} value={String(item.id ?? '')}>{String(item.name ?? '')}</option>)}
               </select>
             </FormField>
             <FormField label="Personne">
               <select value={assignmentForm.personId} onChange={(event) => setAssignmentForm((current) => ({ ...current, personId: event.target.value }))}>
-                <option value="">Selectionner</option>
+                <option value="">Sélectionner</option>
                 {people.data.map((item) => <option key={item.id ?? ''} value={item.id ?? ''}>{item.firstName ?? ''} {item.lastName ?? ''}</option>)}
               </select>
             </FormField>
-            <FormField label="Debut"><input type="datetime-local" value={assignmentForm.startDate} onChange={(event) => setAssignmentForm((current) => ({ ...current, startDate: event.target.value }))} /></FormField>
+            <FormField label="Début"><input type="datetime-local" value={assignmentForm.startDate} onChange={(event) => setAssignmentForm((current) => ({ ...current, startDate: event.target.value }))} /></FormField>
             <button type="submit" className="primary-button">Attribuer</button>
           </form>
         </Panel>
@@ -614,16 +615,16 @@ export const DocumentsPage = () => {
 
   return (
     <div className="page-stack">
-      <PageIntro title="Documents" description="Publication, assignation et signature interne des documents obligatoires." />
+      <PageIntro title="Documents" description="Publication, attribution et signature interne des documents obligatoires." />
       <Panel title="Catalogue documentaire">
         <DataTable rows={documents.data} columns={[
           { header: 'Titre', render: (item) => <button type="button" className="link-button" onClick={() => setSelectedId(String(item.id))}>{String(item.title)}</button> },
-          { header: 'Categorie', render: (item) => String((item.category as Record<string, string> | undefined)?.label ?? '-') },
+          { header: 'Catégorie', render: (item) => String((item.category as Record<string, string> | undefined)?.label ?? '-') },
           { header: 'Version', render: (item) => String((item.currentVersion as Record<string, string> | undefined)?.versionLabel ?? '-') },
         ]} />
       </Panel>
       {selectedDocument.data ? (
-        <Panel title="Detail du document">
+        <Panel title="Détail du document">
           <DocumentViewer
             title={String(selectedDocument.data.title)}
             content={String((selectedDocument.data.currentVersion as Record<string, string> | undefined)?.contentMarkdown ?? 'Aucun contenu')}
@@ -639,8 +640,8 @@ export const DocumentsPage = () => {
         </Panel>
       ) : null}
       <div className="content-grid two-columns">
-        <Panel title="Creer un document">
-          {categories.length === 0 ? <EmptyState title="Categorie requise" message="Selectionnez un document existant pour reprendre une categorie, ou utilisez l'API admin si besoin." /> : null}
+        <Panel title="Créer un document">
+          {categories.length === 0 ? <EmptyState title="Catégorie requise" message="Sélectionnez un document existant pour reprendre une catégorie, ou utilisez l’API d’administration si nécessaire." /> : null}
           <form className="stack-form" onSubmit={(event) => {
             event.preventDefault();
             void api.post('/documents', {
@@ -659,14 +660,14 @@ export const DocumentsPage = () => {
             <button type="submit" className="primary-button">Publier</button>
           </form>
         </Panel>
-        <Panel title="Assigner un document">
+        <Panel title="Attribuer un document">
           <form className="stack-form" onSubmit={(event) => {
             event.preventDefault();
             void api.post(`/documents/${assignForm.documentId}/assign`, { personIds: assignForm.personIds }).then(() => documents.reload());
           }}>
             <FormField label="Document">
               <select value={assignForm.documentId} onChange={(event) => setAssignForm((current) => ({ ...current, documentId: event.target.value }))}>
-                <option value="">Selectionner</option>
+                <option value="">Sélectionner</option>
                 {documents.data.map((item) => <option key={String(item.id ?? '')} value={String(item.id ?? '')}>{String(item.title ?? '')}</option>)}
               </select>
             </FormField>
@@ -691,17 +692,17 @@ export const MePage = () => {
 
   return (
     <div className="page-stack">
-      <PageIntro title="Mon espace" description="Mon profil, mes acces, mes documents et mes engagements." />
+      <PageIntro title="Mon espace" description="Mon profil, mes accès, mes documents et mes engagements." />
       <div className="content-grid two-columns">
         <Panel title="Profil">
           <dl className="definition-list">
             <div><dt>Nom</dt><dd>{profile.data.firstName} {profile.data.lastName}</dd></div>
             <div><dt>Email</dt><dd>{profile.data.emailProfessional}</dd></div>
             <div><dt>Poste</dt><dd>{profile.data.position}</dd></div>
-            <div><dt>Region</dt><dd>{profile.data.region}</dd></div>
+            <div><dt>Région</dt><dd>{profile.data.region}</dd></div>
           </dl>
         </Panel>
-        <Panel title="Documents a traiter">
+        <Panel title="Documents à traiter">
           <DataTable rows={documents.data} columns={[
             { header: 'Titre', render: (item) => item.documentTitle },
             { header: 'Version', render: (item) => item.versionLabel },
@@ -710,10 +711,10 @@ export const MePage = () => {
         </Panel>
       </div>
       <div className="content-grid two-columns">
-        <Panel title="Mes acces">
-          <p>Materiel: {(accesses.data.material ?? []).length}</p>
-          <p>Logiciels: {(accesses.data.software ?? []).length}</p>
-          <p>Informations: {(accesses.data.information ?? []).length}</p>
+        <Panel title="Mes accès">
+          <p>Matériel : {(accesses.data.material ?? []).length}</p>
+          <p>Logiciels : {(accesses.data.software ?? []).length}</p>
+          <p>Informations : {(accesses.data.information ?? []).length}</p>
         </Panel>
         <Panel title="Mes signatures">
           <DataTable rows={signatures.data} columns={[
@@ -736,9 +737,9 @@ export const WorkflowsPage = () => {
 
   return (
     <div className="page-stack">
-      <PageIntro title="Workflows" description="Suivi des parcours onboarding et offboarding avec checklists visuelles." />
+      <PageIntro title="Parcours" description="Suivi des parcours d’arrivée et de départ avec des checklists visuelles." />
       <div className="content-grid two-columns">
-        <Panel title="Onboardings">
+        <Panel title="Arrivées">
           <DataTable rows={onboardings.data} columns={[
             { header: 'Personne', render: (item) => item.personName },
             { header: 'Statut', render: (item) => <StatusBadge value={String(item.status ?? '')} /> },
@@ -752,13 +753,13 @@ export const WorkflowsPage = () => {
             });
           }}>
             <select value={onboardingPersonId} onChange={(event) => setOnboardingPersonId(event.target.value)}>
-              <option value="">Nouvel onboarding</option>
+              <option value="">Nouvelle arrivée</option>
               {people.data.map((item) => <option key={item.id ?? ''} value={item.id ?? ''}>{item.firstName ?? ''} {item.lastName ?? ''}</option>)}
             </select>
-            <button type="submit" className="primary-button">Creer</button>
+            <button type="submit" className="primary-button">Créer</button>
           </form>
         </Panel>
-        <Panel title="Offboardings">
+        <Panel title="Départs">
           <DataTable rows={offboardings.data} columns={[
             { header: 'Personne', render: (item) => item.personName },
             { header: 'Statut', render: (item) => <StatusBadge value={String(item.status ?? '')} /> },
@@ -772,10 +773,10 @@ export const WorkflowsPage = () => {
             });
           }}>
             <select value={offboardingPersonId} onChange={(event) => setOffboardingPersonId(event.target.value)}>
-              <option value="">Nouvel offboarding</option>
+              <option value="">Nouveau départ</option>
               {people.data.map((item) => <option key={item.id ?? ''} value={item.id ?? ''}>{item.firstName ?? ''} {item.lastName ?? ''}</option>)}
             </select>
-            <button type="submit" className="primary-button">Creer</button>
+            <button type="submit" className="primary-button">Créer</button>
           </form>
         </Panel>
       </div>
@@ -791,22 +792,22 @@ export const AdminPage = () => {
 
   return (
     <div className="page-stack">
-      <PageIntro title="Administration" description="Roles, permissions, connecteurs mock et paramètres d'architecture." />
+      <PageIntro title="Administration" description="Rôles, permissions, connecteurs simulés et paramètres d’architecture." />
       <div className="content-grid three-columns">
-        <Panel title="Roles">
+        <Panel title="Rôles">
           <DataTable rows={roles.data} columns={[
-            { header: 'Role', render: (item) => String(item.name) },
+            { header: 'Rôle', render: (item) => getDisplayLabel(String((item as { code?: unknown }).code ?? (item as { name?: unknown }).name ?? '')) },
             { header: 'Permissions', render: (item) => String((item.permissions as Array<unknown> | undefined)?.length ?? 0) },
           ]} />
         </Panel>
         <Panel title="Permissions">
           <DataTable rows={permissions.data} columns={[{ header: 'Code', render: (item) => item.code }]} />
         </Panel>
-        <Panel title="Readiness">
+        <Panel title="État de préparation">
           <dl className="definition-list">
-            <div><dt>Mode mock</dt><dd>{String(readiness.data.mockConnectorsEnabled ?? false)}</dd></div>
-            <div><dt>Strategie annuaire</dt><dd>{String(readiness.data.directorySyncStrategy ?? '-')}</dd></div>
-            <div><dt>Graph</dt><dd>{String(readiness.data.graphBaseUrl ?? '-')}</dd></div>
+            <div><dt>Mode simulation</dt><dd>{getBooleanLabel(Boolean(readiness.data.mockConnectorsEnabled ?? false))}</dd></div>
+            <div><dt>Stratégie d’annuaire</dt><dd>{readiness.data.directorySyncStrategy ? getDisplayLabel(String(readiness.data.directorySyncStrategy)) : 'Non défini'}</dd></div>
+            <div><dt>Graph</dt><dd>{String(readiness.data.graphBaseUrl ?? 'Non défini')}</dd></div>
           </dl>
         </Panel>
       </div>
@@ -839,16 +840,16 @@ export const NotificationsPage = ({ compact = false }: { compact?: boolean }) =>
   const notifications = useRemote(async () => (await api.get('/notifications')).data as Array<Record<string, unknown>>, [], []);
 
   const content = (
-    <Panel title={compact ? 'Notifications recentes' : 'Centre de notifications'}>
+    <Panel title={compact ? 'Notifications récentes' : 'Centre de notifications'}>
       <DataTable rows={notifications.data} columns={[
         { header: 'Titre', render: (item) => String(item.title) },
         { header: 'Type', render: (item) => <StatusBadge value={String(item.type)} /> },
-        { header: 'Statut', render: (item) => <StatusBadge value={String(item.isRead ? 'LUE' : 'A TRAITER')} /> },
+        { header: 'Statut', render: (item) => <StatusBadge value={String(item.isRead ? 'LUE' : 'A_TRAITER')} /> },
         {
           header: 'Action',
           render: (item) =>
             item.isRead ? (
-              'Deja lue'
+              'Déjà lue'
             ) : (
               <button type="button" className="secondary-button" onClick={() => void api.patch(`/notifications/${String(item.id)}/read`).then(() => notifications.reload())}>
                 Marquer comme lue
@@ -865,7 +866,7 @@ export const NotificationsPage = ({ compact = false }: { compact?: boolean }) =>
 
   return (
     <div className="page-stack">
-      <PageIntro title="Notifications" description="Alertes internes liées aux documents, échéances et workflows en attente." />
+      <PageIntro title="Notifications" description="Alertes internes liées aux documents, aux échéances et aux parcours en attente." />
       {content}
     </div>
   );

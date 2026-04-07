@@ -5,7 +5,7 @@ const sessionUser = {
   id: 'user-1',
   userId: 'user-1',
   personId: 'person-1',
-  displayName: 'Demo Manager',
+  displayName: 'Lucie Moreau',
   email: 'manager@ufcv.demo',
   role: 'SUPER_ADMIN',
   permissions: [
@@ -61,7 +61,7 @@ const mockApi = async (page: Parameters<typeof test>[0]['page']) => {
       json: [
         {
           id: 'notif-1',
-          title: 'Document a signer',
+          title: 'Document à signer',
           type: 'ACTION_REQUIRED',
           isRead: false,
         },
@@ -80,8 +80,8 @@ const mockApi = async (page: Parameters<typeof test>[0]['page']) => {
             emailProfessional: 'lucie@ufcv.demo',
             actorType: 'SALARIE',
             status: 'ACTIVE',
-            position: 'Responsable regionale',
-            region: 'AURA',
+            position: 'Responsable régionale',
+            region: 'Auvergne-Rhône-Alpes',
             city: 'Lyon',
           },
         ],
@@ -97,7 +97,7 @@ const mockApi = async (page: Parameters<typeof test>[0]['page']) => {
         firstName: 'Lucie',
         lastName: 'Moreau',
         emailProfessional: 'lucie@ufcv.demo',
-        position: 'Responsable regionale',
+        position: 'Responsable régionale',
         managerName: 'Sophie Martin',
         status: 'ACTIVE',
       },
@@ -170,7 +170,7 @@ const mockApi = async (page: Parameters<typeof test>[0]['page']) => {
   });
 
   await page.route('**/api/v1/actor-types', async (route) => {
-    await route.fulfill({ json: [{ id: 'actor-1', label: 'Salarie' }] });
+    await route.fulfill({ json: [{ id: 'actor-1', label: 'Salarié' }] });
   });
 };
 
@@ -178,7 +178,7 @@ test('login, consultation personne, signature, attribution et theme', async ({ p
   await mockApi(page);
 
   await page.goto('/login');
-  await page.getByLabel('Login').fill('superadmin');
+  await page.getByLabel('Identifiant').fill('superadmin');
   await page.getByLabel('Mot de passe').fill('demo1234');
   await page.getByRole('button', { name: 'Se connecter' }).click();
   await page.goto('/');
@@ -187,7 +187,7 @@ test('login, consultation personne, signature, attribution et theme', async ({ p
 
   await page.goto('/people');
   await page.getByRole('link', { name: /Lucie Moreau/i }).click();
-  await expect(page.getByText('Responsable regionale')).toBeVisible();
+  await expect(page.getByText('Responsable régionale')).toBeVisible();
 
   await page.goto('/documents');
   await page.getByRole('button', { name: /Charte informatique/i }).click();

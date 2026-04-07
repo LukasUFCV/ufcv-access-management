@@ -41,7 +41,7 @@ export class AccessManagementService {
     context: { ipAddress?: string | null; userAgent?: string | null },
   ) {
     const asset = await prisma.materialAsset.findUnique({ where: { id: assetId } });
-    if (!asset) throw new AppError(404, 'Materiel introuvable.');
+    if (!asset) throw new AppError(404, 'Matériel introuvable.');
 
     const assignment = await prisma.materialAssignment.create({
       data: {
@@ -91,7 +91,7 @@ export class AccessManagementService {
     });
 
     if (!assignment) {
-      throw new AppError(404, 'Aucune attribution active trouvee pour ce materiel.');
+      throw new AppError(404, 'Aucune attribution active trouvée pour ce matériel.');
     }
 
     const updated = await prisma.materialAssignment.update({
@@ -271,7 +271,7 @@ export class AccessManagementService {
     context: { ipAddress?: string | null; userAgent?: string | null },
   ) {
     const assignment = await prisma.informationAssignment.findUnique({ where: { id: assignmentId } });
-    if (!assignment) throw new AppError(404, "Attribution d'information introuvable.");
+    if (!assignment) throw new AppError(404, 'Attribution d’information introuvable.');
 
     const updated = await prisma.informationAssignment.update({
       where: { id: assignmentId },

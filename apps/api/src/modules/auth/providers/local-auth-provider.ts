@@ -44,7 +44,7 @@ const buildSessionUser = (user: UserWithRoles): SessionUser => {
   const primaryRole = roles[0]?.role.code;
 
   if (!primaryRole) {
-    throw new AppError(500, "L'utilisateur n'a aucun rôle attribué.");
+    throw new AppError(500, 'Aucun rôle n’est attribué à cet utilisateur.');
   }
 
   const permissions = new Set<string>();

@@ -35,9 +35,9 @@ const mapPersonListItem = (
   emailProfessional: person.emailProfessional,
   actorType: person.actorType.code as PersonListItem['actorType'],
   status: person.status as PersonListItem['status'],
-  position: person.position?.title ?? 'Non renseigne',
-  region: person.region?.name ?? 'Non renseignee',
-  city: person.city?.name ?? 'Non renseignee',
+  position: person.position?.title ?? 'Non renseigné',
+  region: person.region?.name ?? 'Non renseignée',
+  city: person.city?.name ?? 'Non renseignée',
   managerName: person.manager ? `${person.manager.firstName} ${person.manager.lastName}` : null,
   isExternal: person.isExternal,
   startDate: person.startDate?.toISOString() ?? null,
@@ -133,7 +133,7 @@ export class PeopleService {
       data: {
         personId: person.id,
         toStatus: person.status,
-        reason: 'Creation du dossier',
+        reason: 'Création du dossier',
       },
     });
 
@@ -171,7 +171,7 @@ export class PeopleService {
           personId: person.id,
           fromStatus: existing.status,
           toStatus: input.status as PersonStatus,
-          reason: 'Mise a jour du dossier',
+          reason: 'Mise à jour du dossier',
         },
       });
     }

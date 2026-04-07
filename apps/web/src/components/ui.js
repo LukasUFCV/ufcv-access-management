@@ -3,10 +3,11 @@ import { AlertTriangle, Bell, CheckCircle2, MoonStar, Search, SunMedium, SunMoon
 import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '@/app/providers/ThemeProvider';
+import { getAuditActionLabel, getDisplayLabel, getEntityLabel } from '@/lib/labels';
 export const ThemeToggle = () => {
     const { mode, setMode } = useTheme();
-    return (_jsx("div", { className: "theme-toggle", "aria-label": "Changer le theme", children: [
-            { value: 'system', label: 'Systeme', icon: _jsx(SunMoon, { size: 16 }) },
+    return (_jsx("div", { className: "theme-toggle", "aria-label": "Changer le th\u00E8me", children: [
+            { value: 'system', label: 'Système', icon: _jsx(SunMoon, { size: 16 }) },
             { value: 'light', label: 'Clair', icon: _jsx(SunMedium, { size: 16 }) },
             { value: 'dark', label: 'Sombre', icon: _jsx(MoonStar, { size: 16 }) },
         ].map((item) => (_jsxs("button", { className: mode === item.value ? 'active' : '', type: "button", onClick: () => setMode(item.value), children: [item.icon, _jsx("span", { children: item.label })] }, item.value))) }));
@@ -18,23 +19,35 @@ export const StatusBadge = ({ value }) => {
     const className = normalized.includes('active') ||
         normalized.includes('signe') ||
         normalized.includes('done') ||
-        normalized.includes('termine')
+        normalized.includes('termine') ||
+        normalized.includes('available') ||
+        normalized.includes('success') ||
+        normalized.includes('lue') ||
+        normalized.includes('returned')
         ? 'success'
         : normalized.includes('warning') ||
             normalized.includes('expire') ||
             normalized.includes('transition') ||
             normalized.includes('en_cours') ||
-            normalized.includes('a_signer')
+            normalized.includes('en_attente') ||
+            normalized.includes('a_signer') ||
+            normalized.includes('a_lire') ||
+            normalized.includes('a_traiter') ||
+            normalized.includes('assigned') ||
+            normalized.includes('action_required')
             ? 'warning'
-            : normalized.includes('revoke') || normalized.includes('sortie') || normalized.includes('bloque')
+            : normalized.includes('revoke') ||
+                normalized.includes('sortie') ||
+                normalized.includes('bloque') ||
+                normalized.includes('error')
                 ? 'danger'
                 : 'neutral';
-    return _jsx("span", { className: `status-badge ${className}`, children: value.replaceAll('_', ' ') });
+    return _jsx("span", { className: `status-badge ${className}`, children: getDisplayLabel(value) });
 };
 export const MetricCard = ({ label, value, hint, }) => (_jsxs("article", { className: "metric-card", children: [_jsx("span", { children: label }), _jsx("strong", { children: value }), hint ? _jsx("small", { children: hint }) : null] }));
 export const EmptyState = ({ title, message, }) => (_jsxs("div", { className: "empty-state", children: [_jsx(CheckCircle2, { size: 18 }), _jsxs("div", { children: [_jsx("strong", { children: title }), _jsx("p", { children: message })] })] }));
-export const ErrorState = ({ message, onRetry, }) => (_jsxs("div", { className: "error-state", children: [_jsx(AlertTriangle, { size: 18 }), _jsxs("div", { children: [_jsx("strong", { children: "Erreur" }), _jsx("p", { children: message })] }), onRetry ? (_jsx("button", { type: "button", className: "secondary-button", onClick: onRetry, children: "Reessayer" })) : null] }));
-export const DataTable = ({ columns, rows, emptyTitle = 'Aucune donnee', emptyMessage = 'Aucun element ne correspond aux filtres.', }) => {
+export const ErrorState = ({ message, onRetry, }) => (_jsxs("div", { className: "error-state", children: [_jsx(AlertTriangle, { size: 18 }), _jsxs("div", { children: [_jsx("strong", { children: "Erreur" }), _jsx("p", { children: message })] }), onRetry ? (_jsx("button", { type: "button", className: "secondary-button", onClick: onRetry, children: "R\u00E9essayer" })) : null] }));
+export const DataTable = ({ columns, rows, emptyTitle = 'Aucune donnée', emptyMessage = 'Aucun élément ne correspond aux filtres.', }) => {
     if (!rows.length) {
         return _jsx(EmptyState, { title: emptyTitle, message: emptyMessage });
     }
@@ -44,18 +57,18 @@ export const FormField = ({ label, hint, children, }) => (_jsxs("label", { class
 export const Panel = ({ title, actions, children, }) => (_jsxs("section", { className: "panel", children: [_jsxs("div", { className: "panel-header", children: [_jsx("h2", { children: title }), actions] }), children] }));
 export const OrgChart = ({ nodes }) => {
     if (!nodes.length) {
-        return _jsx(EmptyState, { title: "Aucun noeud", message: "L'organigramme est vide pour les filtres courants." });
+        return _jsx(EmptyState, { title: "Aucun n\u0153ud", message: "L\u2019organigramme est vide pour les filtres en cours." });
     }
     return (_jsx("div", { className: "org-tree", children: nodes.map((node) => (_jsx(OrgTreeNode, { node: node }, String(node.id)))) }));
 };
 const OrgTreeNode = ({ node }) => {
     const children = node.children ?? [];
-    return (_jsxs("div", { className: "org-node", children: [_jsxs("div", { className: "org-node-card", children: [_jsx("strong", { children: String(node.name) }), _jsx("span", { children: String(node.type) }), _jsxs("small", { children: [node.region ?? 'Sans region', " \u00B7 ", node.peopleCount ?? 0, " personnes"] })] }), children.length ? (_jsx("div", { className: "org-node-children", children: children.map((child) => (_jsx(OrgTreeNode, { node: child }, String(child.id)))) })) : null] }));
+    return (_jsxs("div", { className: "org-node", children: [_jsxs("div", { className: "org-node-card", children: [_jsx("strong", { children: String(node.name) }), _jsx("span", { children: getDisplayLabel(String(node.type)) }), _jsxs("small", { children: [node.region ?? 'Sans région', " \u00B7 ", node.peopleCount ?? 0, " personnes"] })] }), children.length ? (_jsx("div", { className: "org-node-children", children: children.map((child) => (_jsx(OrgTreeNode, { node: child }, String(child.id)))) })) : null] }));
 };
-export const AuditTimeline = ({ items }) => (_jsx("div", { className: "timeline", children: items.length ? (items.map((item) => (_jsxs("article", { className: "timeline-item", children: [_jsx("div", { className: "timeline-dot" }), _jsxs("div", { children: [_jsx("strong", { children: String(item.action) }), _jsx("p", { children: String(item.entityType) }), _jsx("small", { children: new Date(String(item.createdAt)).toLocaleString('fr-FR') })] })] }, String(item.id))))) : (_jsx(EmptyState, { title: "Aucune action", message: "Aucun evenement d'audit disponible." })) }));
+export const AuditTimeline = ({ items }) => (_jsx("div", { className: "timeline", children: items.length ? (items.map((item) => (_jsxs("article", { className: "timeline-item", children: [_jsx("div", { className: "timeline-dot" }), _jsxs("div", { children: [_jsx("strong", { children: getAuditActionLabel(String(item.action)) }), _jsxs("p", { children: [getEntityLabel(String(item.entityType)), item.actorName ? ` · ${String(item.actorName)}` : ''] }), _jsx("small", { children: new Date(String(item.createdAt)).toLocaleString('fr-FR') })] })] }, String(item.id))))) : (_jsx(EmptyState, { title: "Aucune action", message: "Aucun \u00E9v\u00E9nement d\u2019audit n\u2019est disponible." })) }));
 export const DocumentViewer = ({ title, content, }) => (_jsxs("article", { className: "document-viewer", children: [_jsx("h3", { children: title }), _jsx("div", { children: content.split('\n').map((line, index) => (_jsx(Fragment, { children: _jsx("p", { children: line }) }, `${title}-${index}`))) })] }));
-export const SignaturePanel = ({ canSign, onSign, isBusy, }) => (_jsxs("div", { className: "signature-panel", children: [_jsxs("div", { children: [_jsx("strong", { children: "Signature interne" }), _jsx("p", { children: "Cette signature confirme la lecture et l'engagement interne. Elle ne constitue pas une signature electronique qualifiee." })] }), _jsx("button", { type: "button", className: "primary-button", disabled: !canSign || isBusy, onClick: onSign, children: isBusy ? 'Signature…' : 'Signer le document' })] }));
-export const NotificationBell = ({ count }) => (_jsxs(Link, { className: "notification-bell", to: "/notifications", children: [_jsx(Bell, { size: 18 }), count ? _jsx("span", { children: count }) : null] }));
+export const SignaturePanel = ({ canSign, onSign, isBusy, }) => (_jsxs("div", { className: "signature-panel", children: [_jsxs("div", { children: [_jsx("strong", { children: "Signature interne" }), _jsx("p", { children: "Cette signature confirme la lecture et l\u2019engagement interne. Elle ne constitue pas une signature \u00E9lectronique qualifi\u00E9e." })] }), _jsx("button", { type: "button", className: "primary-button", disabled: !canSign || isBusy, onClick: onSign, children: isBusy ? 'Signature…' : 'Signer le document' })] }));
+export const NotificationBell = ({ count }) => (_jsxs(Link, { className: "notification-bell", to: "/notifications", "aria-label": "Notifications", children: [_jsx(Bell, { size: 18 }), count ? _jsx("span", { children: count }) : null] }));
 export const ConfirmDialog = ({ message, confirmLabel = 'Confirmer', onConfirm, }) => (_jsx("button", { type: "button", className: "secondary-button", onClick: () => {
         if (window.confirm(message)) {
             onConfirm();
